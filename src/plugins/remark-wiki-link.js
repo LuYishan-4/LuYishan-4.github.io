@@ -382,7 +382,7 @@ function createWikiLinkCard(parsed, context) {
 	const encrypted =
 		typeof meta.data.password === "string" && meta.data.password.length > 0;
 	const description =
-		typeof meta.data.description === "string"
+		!encrypted && typeof meta.data.description === "string"
 			? meta.data.description.trim()
 			: "";
 	const published = formatPublishedDate(meta.data.published);
@@ -417,11 +417,7 @@ function createWikiLinkCard(parsed, context) {
 	}
 
 	const info = [
-		createElement(
-			"div",
-			{ class: `wlc-title${encrypted ? " wlc-encrypted" : ""}` },
-			[createText(title)],
-		),
+		createElement("div", { class: "wlc-title" }, [createText(title)]),
 	];
 	if (description) {
 		info.push(

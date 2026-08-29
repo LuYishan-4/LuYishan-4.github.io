@@ -1,23 +1,13 @@
 import type { AnnouncementConfig } from "../types/announcementConfig";
 
 export const announcementConfig: AnnouncementConfig = {
-	// 公告标题，留空则走i18n默认标题
-	title: "",
+  // 公告标题
+  title: "你好",
 
-	// 公告内容
-	content: "欢迎来到我的博客！这是一则示例公告。",
+  // 公告内容
+  content:
+    "嗨,我是 LuYishan,一個來自新北的學生,過去玩過FRC和其他大大小小的機器人競賽,近期打算多打磨自己在資安和演算法方面的認識",
 
-	// 是否允许用户关闭公告
-	closable: true,
-
-	link: {
-		// 启用链接
-		enable: true,
-		// 链接文本
-		text: "了解更多",
-		// 链接 URL
-		url: "/about/",
-		// 内部链接
-		external: false,
-	},
+  // 是否允许用户关闭公告
+  closable: true,
 };

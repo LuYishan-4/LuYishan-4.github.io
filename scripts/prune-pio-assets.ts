@@ -7,10 +7,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { glob } from "glob";
 import { live2dWidgetConfig, spineModelConfig } from "../src/config";
-import { resolveSiteRoot } from "./site-root";
 
-// Cloudflare Pages 上产物在 dist/client，本地在 dist，统一对准真实根目录
-const DIST_DIR = resolveSiteRoot();
+const DIST_DIR = "dist";
 
 // 看板娘资源根目录（相对 dist/），两种看板娘都关掉时整个删掉
 const PIO_ROOT = "pio";
@@ -63,13 +61,11 @@ async function main() {
 	const spineEnabled = spineModelConfig.enable;
 
 	if (live2dEnabled && spineEnabled) {
-		console.log(
-			"🎎 Live2D + Spine models are both enabled, keeping all pio assets",
-		);
+		console.log("🎎 Live2D + Spine 看板娘均已启用，保留全部 pio 资源");
 		return;
 	}
 
-	console.log("🎎 Pruning unused mascot assets in dist/...");
+	console.log("🎎 Pruning unused 看板娘 assets in dist/...");
 
 	const targets: string[] = [];
 	if (!live2dEnabled && !spineEnabled) {
@@ -91,15 +87,15 @@ async function main() {
 	}
 
 	if (removedCount === 0) {
-		console.log("✨ No mascot assets to prune");
+		console.log("✨ 没有需要清理的看板娘资源");
 		return;
 	}
 	console.log(
-		`✨ Pruned ${removedCount} mascot assets, freed ${(freed / 1024 / 1024).toFixed(2)} MiB`,
+		`✨ Pruned ${removedCount} 项看板娘资源, freed ${(freed / 1024 / 1024).toFixed(2)} MiB`,
 	);
 }
 
 main().catch((err) => {
-	console.error("❌ Failed to prune mascot assets:", err);
+	console.error("❌ 看板娘资源裁剪失败:", err);
 	process.exit(1);
 });

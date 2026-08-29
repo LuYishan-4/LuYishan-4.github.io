@@ -6,11 +6,10 @@
 @import './transition.css';
 @import './custom-scrollbar.css';
 @import './gallery.css';
-@import './media-grid.css';
+@import './anime-bangumi.css';
 @import './tags.css';
 @import './display-settings.css';
 @import './categories.css';
-@import './layout-base.css';
 
 @plugin '@tailwindcss/typography';
 
@@ -286,21 +285,6 @@ html {
         background-color: var(--card-bg-transparent) !important;
     }
 
-    /* 全屏壁纸首页动态透明（semifull）：顶部透明，下滑后显示卡片底色。
-       需要比上面 wallpaper-transparent 的固定底色更高特异性，才能让顶部透明生效 */
-    html[data-wallpaper-mode="fullscreen"] #navbar[data-transparent-mode="semifull"]:not(.scrolled) > div {
-        background: transparent !important;
-        --navbar-surface-blur: 0px !important;
-        box-shadow: none !important;
-    }
-
-    /* 全屏壁纸模式：导航栏统一禁用边框/轮廓（覆盖 semifull/none 及 enable-card-border 的卡片边框），
-       避免切换页面瞬间 enable-card-border 边框闪现黑色边框 */
-    html[data-wallpaper-mode="fullscreen"] #navbar > div {
-        border: none !important;
-        outline: none !important;
-    }
-
     /* Overlay 模式下，滚动后提高导航栏背景模糊度，增强与正文区分 */
     .wallpaper-transparent #navbar.navbar-sticky-shadow > div {
         --navbar-surface-blur: 20px !important;
@@ -316,11 +300,6 @@ html {
     }
 
     .wallpaper-transparent .bg-\(--card-bg\) {
-        background-color: var(--card-bg-transparent) !important;
-    }
-
-    /* 透明模式：文章页系列导航盒底色由实色换为半透明 */
-    .wallpaper-transparent .series-nav-toggle {
         background-color: var(--card-bg-transparent) !important;
     }
 

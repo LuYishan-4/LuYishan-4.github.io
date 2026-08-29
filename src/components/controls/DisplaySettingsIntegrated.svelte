@@ -83,9 +83,6 @@ let isSmallScreen = $state(
 let isMobileWidth = $state(
 	typeof window !== "undefined" ? window.innerWidth < 780 : false,
 );
-let isMobileViewport = $state(
-	typeof window !== "undefined" ? window.innerWidth < 1024 : false,
-);
 let isSwitching = $state(false);
 let wavesEnabled = $state(true);
 const defaultWavesEnabled = getDefaultWavesEnabled();
@@ -153,13 +150,6 @@ const hasOverlaySettings =
 	(isOverlayOpacitySwitchable ||
 		isOverlayBlurSwitchable ||
 		isOverlayCardOpacitySwitchable);
-// 全屏壁纸模式的模糊渐变是否启用（按当前设备读取 fullscreen.blurRamp 配置，未配置默认开启）
-const isFullscreenBlurRampEnabled = $derived.by(() => {
-	const enable = backgroundWallpaper.fullscreen?.blurRamp?.enable;
-	if (typeof enable === "boolean") return enable;
-	if (!enable) return true;
-	return isMobileViewport ? enable.mobile : enable.desktop;
-});
 let overlaySettingsIsDefault = $derived(
 	(!isOverlayOpacitySwitchable || overlayOpacity === defaultOverlayOpacity) &&
 		(!isOverlayBlurSwitchable || overlayBlur === defaultOverlayBlur) &&
@@ -197,9 +187,7 @@ const hasAppearanceTab = $derived(
 );
 const hasWallpaperTab = $derived(
 	isWallpaperSwitchable ||
-		((wallpaperMode === WALLPAPER_OVERLAY ||
-			wallpaperMode === WALLPAPER_FULLSCREEN) &&
-			hasOverlaySettings) ||
+		(wallpaperMode === WALLPAPER_OVERLAY && hasOverlaySettings) ||
 		((wallpaperMode === WALLPAPER_BANNER ||
 			wallpaperMode === WALLPAPER_FULLSCREEN) &&
 			hasBannerSettings),
@@ -239,13 +227,9 @@ $effect(() => {
 	}
 });
 
-// Auto-switch to wallpaper tab when entering overlay/fullscreen mode
+// Auto-switch to wallpaper tab when entering overlay mode
 $effect(() => {
-	if (
-		(wallpaperMode === WALLPAPER_OVERLAY ||
-			wallpaperMode === WALLPAPER_FULLSCREEN) &&
-		hasOverlaySettings
-	) {
+	if (wallpaperMode === WALLPAPER_OVERLAY && hasOverlaySettings) {
 		activeTab = "wallpaper";
 	}
 });
@@ -253,9 +237,7 @@ $effect(() => {
 let overlaySliderItems = $derived<OverlaySliderItem[]>([
 	{
 		key: "opacity",
-		// 全屏壁纸模式不需要背景透明度，隐藏该滑块（仍显示模糊与卡片透明度）
-		enabled:
-			isOverlayOpacitySwitchable && wallpaperMode !== WALLPAPER_FULLSCREEN,
+		enabled: isOverlayOpacitySwitchable,
 		label: i18n(I18nKey.overlayOpacity),
 		displayValue: `${Math.round(overlayOpacity * 100)}%`,
 		ariaLabel: i18n(I18nKey.overlayOpacity),
@@ -269,10 +251,7 @@ let overlaySliderItems = $derived<OverlaySliderItem[]>([
 	},
 	{
 		key: "blur",
-		// 全屏壁纸模式关闭模糊渐变时隐藏模糊滑块（overlay 模式不受影响）
-		enabled:
-			isOverlayBlurSwitchable &&
-			!(wallpaperMode === WALLPAPER_FULLSCREEN && !isFullscreenBlurRampEnabled),
+		enabled: isOverlayBlurSwitchable,
 		label: i18n(I18nKey.overlayBlur),
 		displayValue: `${overlayBlur.toFixed(1)}px`,
 		ariaLabel: i18n(I18nKey.overlayBlur),
@@ -299,10 +278,6 @@ let overlaySliderItems = $derived<OverlaySliderItem[]>([
 		},
 	},
 ]);
-// 当前模式下是否有任何 overlay 滑块实际可见（模糊滑块可能因关闭模糊渐变而隐藏）
-let hasVisibleOverlaySlider = $derived(
-	overlaySliderItems.some((item) => item.enabled),
-);
 
 function resetHue() {
 	hue = getDefaultHue();
@@ -437,7 +412,7 @@ function switchWallpaperMode(newMode: WALLPAPER_MODE) {
 	setWallpaperMode(newMode);
 	window.scrollTo({ top: 0 });
 
-	if (newMode === WALLPAPER_OVERLAY || newMode === WALLPAPER_FULLSCREEN) {
+	if (newMode === WALLPAPER_OVERLAY) {
 		requestAnimationFrame(refreshAllRangeProgress);
 	}
 }
@@ -445,7 +420,6 @@ function switchWallpaperMode(newMode: WALLPAPER_MODE) {
 function checkScreenSize() {
 	isSmallScreen = window.innerWidth < 1200;
 	isMobileWidth = window.innerWidth < 780;
-	isMobileViewport = window.innerWidth < 1024;
 	// 低于380px强制网格模式
 	if (window.innerWidth < 380 && currentLayout === "list") {
 		currentLayout = "grid";
@@ -607,14 +581,6 @@ $effect(() => {
 		if (isOverlayOpacitySwitchable) {
 			setOverlayOpacity(overlayOpacity);
 		}
-		if (isOverlayBlurSwitchable) {
-			setOverlayBlur(overlayBlur);
-		}
-		if (isOverlayCardOpacitySwitchable) {
-			setOverlayCardOpacity(overlayCardOpacity);
-		}
-	} else if (wallpaperMode === WALLPAPER_FULLSCREEN) {
-		// 全屏壁纸不透明，只应用模糊与卡片透明度
 		if (isOverlayBlurSwitchable) {
 			setOverlayBlur(overlayBlur);
 		}
@@ -834,8 +800,8 @@ $effect(() => {
 		</div>
 		{/if}
 
-		<!-- Overlay Settings Section（全屏壁纸模式也复用 overlay 的透明/模糊/卡片透明度设置） -->
-		{#if (wallpaperMode === WALLPAPER_OVERLAY || wallpaperMode === WALLPAPER_FULLSCREEN) && hasOverlaySettings && hasVisibleOverlaySlider}
+		<!-- Overlay Settings Section -->
+		{#if wallpaperMode === WALLPAPER_OVERLAY && hasOverlaySettings}
 		<div class="">
 			<div class="section-title">
 				{i18n(I18nKey.overlaySettings)}
@@ -922,8 +888,8 @@ $effect(() => {
 					</div>
 				</button>
 				{/if}
-				<!-- Waves Animation Switch（仅横幅模式，全屏壁纸无水波纹） -->
-				{#if isWavesSwitchable && wallpaperMode === WALLPAPER_BANNER}
+				<!-- Waves Animation Switch -->
+				{#if isWavesSwitchable}
 				<button
 					class="w-full btn-regular rounded-md py-2 px-3 flex items-center gap-3 text-left active:scale-95 transition-all relative overflow-hidden"
 					class:bg-(--btn-regular-bg-hover)={wavesEnabled}
@@ -940,8 +906,8 @@ $effect(() => {
 					</div>
 				</button>
 				{/if}
-				<!-- Gradient Transition Switch（仅横幅模式，全屏壁纸无渐变过渡） -->
-				{#if isGradientSwitchable && wallpaperMode === WALLPAPER_BANNER}
+				<!-- Gradient Transition Switch -->
+				{#if isGradientSwitchable}
 				<button
 					class="w-full btn-regular rounded-md py-2 px-3 flex items-center gap-3 text-left active:scale-95 transition-all relative overflow-hidden"
 					class:bg-(--btn-regular-bg-hover)={gradientEnabled}

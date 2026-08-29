@@ -9,14 +9,11 @@ import { glob } from "glob";
 import subsetFont from "subset-font";
 import { fontConfig, fontsList } from "../src/config";
 import { collectUsedFontCssVars, toPublicPath } from "../src/utils/fontHelper";
-import { resolveSiteRoot } from "./site-root";
 
 // ─── 配置 ───────────────────────────────────────────────
 
-// Cloudflare Pages 上产物在 dist/client，本地在 dist，统一对准真实根目录
-const siteRoot = resolveSiteRoot();
-const DIST_DIR = siteRoot;
-const OUTPUT_DIR = `${siteRoot}/_astro/fonts`;
+const DIST_DIR = "dist";
+const OUTPUT_DIR = "dist/_astro/fonts";
 
 // ─── 字体配置解析 ────────────────────────────────────────
 

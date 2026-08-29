@@ -13,20 +13,12 @@ export const ru: Translation = {
 	[Key.searchContent]: "Содержание",
 	[Key.searchViewMore]: "Показать еще ({count} шт)",
 	[Key.other]: "Прочее",
-
-	// Группы меню навигации
-	[Key.navArticles]: "Статьи",
-	[Key.navSocial]: "Соцсети",
-	[Key.navMine]: "Моё",
-	[Key.navAbout]: "Обо мне",
-	[Key.navLinks]: "Ссылки",
 	[Key.all]: "Все",
 
 	[Key.tags]: "Теги",
 	[Key.categories]: "Категории",
 	[Key.allCategories]: "Все категории",
 	[Key.allTags]: "Все теги",
-	[Key.allSeries]: "Все серии",
 	[Key.recentPosts]: "Последние посты",
 	[Key.postList]: "Список постов",
 	[Key.tableOfContents]: "Содержание",
@@ -120,10 +112,10 @@ export const ru: Translation = {
 	[Key.updatedAt]: "Обновлено",
 	[Key.readTime]: "Время чтения",
 	[Key.license]: "Лицензия",
-	[Key.bangumi]: "Bangumi",
+	[Key.bangumi]: "Бангуми",
 
 	// Фильтр и статус Бангуми текст
-	[Key.bangumiTitle]: "Мой Bangumi",
+	[Key.bangumiTitle]: "Мой план группы",
 	[Key.bangumiSubtitle]: "Запись моего аниме путешествия",
 	[Key.bangumiFilterAll]: "Все",
 	[Key.bangumiFilterWatched]: "Просмотрено",
@@ -217,14 +209,10 @@ export const ru: Translation = {
 	[Key.vndbLengthLong]: "Длинная",
 	[Key.vndbLengthVeryLong]: "Очень длинная",
 
-	// Отслеживание аниме - Bilibili
-	[Key.bilibili]: "Bilibili",
-	[Key.bilibiliSubtitle]: "Мой список Bilibili (аниме и сериалы)",
-	[Key.bilibiliNotConfigured]: "Источник данных Bilibili не настроен",
-	[Key.bilibiliNotConfiguredDesc]:
-		"Настройте bilibili.uid в src/config/siteConfig.ts",
-
-	// Отслеживание аниме - общие компоненты
+	// Отслеживание аниме
+	[Key.anime]: "Аниме",
+	[Key.animeSubtitle]:
+		"Мой список отслеживания аниме, данные из Bilibili и TMDB",
 	[Key.animeTotal]: "Всего",
 	[Key.animeAverageRating]: "Средний рейтинг",
 	[Key.animeSearch]: "Поиск аниме...",
@@ -237,13 +225,20 @@ export const ru: Translation = {
 	[Key.animeDateAsc]: "Сначала старые",
 	[Key.animeNoResults]: "Аниме не найдено",
 	[Key.animeLastUpdated]: "Данные обновлены",
+	[Key.animeSource]: "Источник",
 	[Key.animeEpStatus]: "Прогресс",
 	[Key.animeViewDetails]: "Подробнее",
+	[Key.animeNotConfigured]: "Источник данных не настроен",
+	[Key.animeNotConfiguredDesc]:
+		"Настройте Bilibili UID или TMDB API Key в src/config/siteConfig.ts",
 	[Key.animeBilibiliAvg]: "Bilibili ср.",
+	[Key.animeTmdbAvg]: "TMDB ср.",
+	[Key.animeDualSynced]: "Два источника",
 	[Key.animeNoOverview]: "Нет описания",
 	[Key.animeClose]: "Закрыть",
 	[Key.animeSynopsis]: "Описание",
 	[Key.animeWatchNow]: "Смотреть",
+	[Key.animeViewTmdb]: "Подробнее на TMDB",
 	[Key.animeAllWithCount]: "Все ({count})",
 	[Key.animeTVWithCount]: "ТВ ({count})",
 	[Key.animeMovieWithCount]: "Фильм ({count})",
@@ -253,36 +248,6 @@ export const ru: Translation = {
 	[Key.animeTypeChinese]: "Китайское аниме",
 	[Key.animeTypeDrama]: "Сериал",
 	[Key.animeTypeConcert]: "Концерт",
-
-	// MyAnimeList
-	[Key.mal]: "MyAnimeList",
-	[Key.malSubtitle]: "Мои списки аниме и манги из MyAnimeList",
-	[Key.malCategoryAnime]: "Аниме",
-	[Key.malCategoryManga]: "Манга",
-	[Key.malFilterAll]: "Все",
-	[Key.malStatusWatching]: "Смотрю",
-	[Key.malStatusReading]: "Читаю",
-	[Key.malStatusCompleted]: "Просмотрено",
-	[Key.malStatusOnHold]: "Отложено",
-	[Key.malStatusDropped]: "Брошено",
-	[Key.malStatusPlanToWatch]: "Хочу посмотреть",
-	[Key.malStatusPlanToRead]: "Хочу прочитать",
-	[Key.malNoData]: "Нет данных",
-	[Key.malNoDataDescription]: "В этой категории нет элементов",
-	[Key.malEmpty]: "Нет данных",
-	[Key.malEmptyReason]:
-		"Возможные причины: имя пользователя не существует, список закрыт, неверный Client ID или проблема с сетью",
-	[Key.malFetchError]: "Ошибка загрузки данных MyAnimeList",
-	[Key.malFetchErrorDesc]:
-		"Не удалось загрузить данные из MyAnimeList API при сборке. Проверьте имя пользователя и Client ID, а также убедитесь, что список открыт.",
-	[Key.malNotConfigured]: "MyAnimeList не настроен",
-	[Key.malNotConfiguredDesc]:
-		"Укажите имя пользователя и Client ID MyAnimeList в src/config/siteConfig.ts (список должен быть открытым)",
-	[Key.malLastUpdated]: "Данные обновлены",
-	[Key.malSeasonWinter]: "Зима",
-	[Key.malSeasonSpring]: "Весна",
-	[Key.malSeasonSummer]: "Лето",
-	[Key.malSeasonFall]: "Осень",
 
 	// Пагинация
 	[Key.paginationFirst]: "Первая",
@@ -351,13 +316,6 @@ export const ru: Translation = {
 	[Key.randomRecommend]: "Случайный",
 	[Key.noRelatedPosts]: "Нет похожих статей",
 	[Key.noRandomPosts]: "Нет случайных статей",
-
-	// Серия статей
-	[Key.series]: "Серии",
-	[Key.seriesPartOf]: "Часть серии",
-	[Key.seriesPart]: "Часть {n}",
-	[Key.seriesThisArticle]: "Эта статья",
-	[Key.noSeries]: "Пока нет серий",
 
 	// Зашифровано
 	[Key.postEncrypted]: "Эта статья зашифрована",

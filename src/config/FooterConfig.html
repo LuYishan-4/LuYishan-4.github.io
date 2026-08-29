@@ -1,1 +1,96 @@
-这里是HTML注入示例，你可以在这个文件中添加自定义的HTML内容
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+  .badge-footer {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0;
+    font-size: 14px;
+    color: var(--primary);
+  }
+  .animal-img {
+    display: flex;
+    justify-content: center;
+  }
+  .badge-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    align-items: center;
+    justify-content: center;
+  }
+  .social-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .social-row a {
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 20px;
+    transition: opacity 0.2s;
+  }
+  .social-row a:hover {
+    opacity: 0.7;
+  }
+  .footer-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--primary);
+    line-height: 1.8;
+  }
+  .footer-info a {
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .footer-info a:hover {
+    color: #409eff;
+  }
+</style>
+
+<div class="badge-footer">
+  <div class="footer-info">
+    <span id="runtime">小破站正在加载...</span>
+  </div>
+  <script is:inline="">
+    if (typeof window.__siteStartTime === "undefined") {
+      window.__siteStartTime = "2026-04-28 00:00:00";
+      function startRuntime() {
+        var el = document.getElementById("runtime");
+        if (!el) return;
+        function update() {
+          var diff = Date.now() - new Date(window.__siteStartTime).getTime();
+          var d = Math.floor(diff / 86400000);
+          var h = Math.floor((diff % 86400000) / 3600000);
+          var m = Math.floor((diff % 3600000) / 60000);
+          var s = Math.floor((diff % 60000) / 1000);
+          el.innerHTML =
+            '小破站已运行 <span style="color:#FFA500">' +
+            d +
+            '</span>天 <span style="color:#1DBF97">' +
+            h +
+            '</span>时 <span style="color:#8A2BE2">' +
+            m +
+            '</span>分 <span style="color:#007EC6">' +
+            s +
+            "</span>秒";
+        }
+        update();
+        setInterval(update, 1000);
+      }
+      startRuntime();
+    }
+  </script>
+</div>

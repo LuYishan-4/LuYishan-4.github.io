@@ -58,9 +58,7 @@ async function downloadCover(item: VndbUlistEntry): Promise<boolean> {
 			signal: AbortSignal.timeout(20000),
 		});
 		if (!response.ok) {
-			console.warn(
-				`[VNDB] Cover download failed ${item.id}: HTTP ${response.status}`,
-			);
+			console.warn(`[VNDB] 封面下载失败 ${item.id}: HTTP ${response.status}`);
 			return false;
 		}
 		const buffer = Buffer.from(await response.arrayBuffer());
@@ -71,7 +69,7 @@ async function downloadCover(item: VndbUlistEntry): Promise<boolean> {
 			.toFile(localPath);
 		return true;
 	} catch (error) {
-		console.warn(`[VNDB] Cover processing failed ${item.id}:`, error);
+		console.warn(`[VNDB] 封面处理失败 ${item.id}:`, error);
 		return false;
 	}
 }
@@ -99,22 +97,22 @@ async function mapLimit<T>(
 
 async function main() {
 	if (!siteConfig.pages.vndb) {
-		console.log("[VNDB] Page not enabled, skipping cover download");
+		console.log("[VNDB] 页面未启用，跳过封面下载");
 		return;
 	}
 
 	const config = siteConfig.vndb;
 	const userId = config?.userId?.trim();
 	if (!userId || userId === "you-user-id") {
-		console.log("[VNDB] User ID not configured, skipping cover download");
+		console.log("[VNDB] 未配置用户 ID，跳过封面下载");
 		return;
 	}
 	if (!config?.downloadCovers) {
-		console.log("[VNDB] downloadCovers is off, skipping cover download");
+		console.log("[VNDB] downloadCovers 未开启，跳过封面下载");
 		return;
 	}
 	if ((config.mode || "static") !== "static") {
-		console.log("[VNDB] dynamic mode does not support local covers, skipping");
+		console.log("[VNDB] dynamic 模式不支持本地封面，跳过下载");
 		return;
 	}
 
@@ -128,7 +126,7 @@ async function main() {
 		const result = await downloadCover(item);
 		if (index % 5 === 0 || index === items.length - 1) {
 			console.log(
-				`[VNDB] Cover progress ${index + 1}/${items.length} (${item.id})`,
+				`[VNDB] 封面处理进度 ${index + 1}/${items.length} (${item.id})`,
 			);
 		}
 		return result;
@@ -136,7 +134,7 @@ async function main() {
 	const downloaded = results.filter(Boolean).length;
 	const skipped = results.length - downloaded;
 	console.log(
-		`[VNDB] Cover processing done: ${results.length} items total, ${downloaded} downloaded, ${skipped} cached`,
+		`[VNDB] 封面处理完成: 共 ${results.length} 个条目, 新下载 ${downloaded}, 已缓存 ${skipped}`,
 	);
 }
 

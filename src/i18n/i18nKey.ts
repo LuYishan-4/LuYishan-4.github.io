@@ -11,18 +11,10 @@ enum I18nKey {
 	searchViewMore = "searchViewMore",
 	other = "other",
 
-	// 导航栏菜单分组
-	navArticles = "navArticles",
-	navSocial = "navSocial",
-	navMine = "navMine",
-	navAbout = "navAbout",
-	navLinks = "navLinks",
-
 	tags = "tags",
 	categories = "categories",
 	allCategories = "allCategories",
 	allTags = "allTags",
-	allSeries = "allSeries",
 	recentPosts = "recentPosts",
 	postList = "postList",
 	tableOfContents = "tableOfContents",
@@ -213,13 +205,9 @@ enum I18nKey {
 	vndbLengthLong = "vndbLengthLong",
 	vndbLengthVeryLong = "vndbLengthVeryLong",
 
-	// 追番 - Bilibili
-	bilibili = "bilibili",
-	bilibiliSubtitle = "bilibiliSubtitle",
-	bilibiliNotConfigured = "bilibiliNotConfigured",
-	bilibiliNotConfiguredDesc = "bilibiliNotConfiguredDesc",
-
-	// 追番 - 公共组件
+	// 追番
+	anime = "anime",
+	animeSubtitle = "animeSubtitle",
 	animeTotal = "animeTotal",
 	animeAverageRating = "animeAverageRating",
 	animeSearch = "animeSearch",
@@ -232,13 +220,19 @@ enum I18nKey {
 	animeDateAsc = "animeDateAsc",
 	animeNoResults = "animeNoResults",
 	animeLastUpdated = "animeLastUpdated",
+	animeSource = "animeSource",
 	animeEpStatus = "animeEpStatus",
 	animeViewDetails = "animeViewDetails",
+	animeNotConfigured = "animeNotConfigured",
+	animeNotConfiguredDesc = "animeNotConfiguredDesc",
 	animeBilibiliAvg = "animeBilibiliAvg",
+	animeTmdbAvg = "animeTmdbAvg",
+	animeDualSynced = "animeDualSynced",
 	animeNoOverview = "animeNoOverview",
 	animeClose = "animeClose",
 	animeSynopsis = "animeSynopsis",
 	animeWatchNow = "animeWatchNow",
+	animeViewTmdb = "animeViewTmdb",
 	animeAllWithCount = "animeAllWithCount",
 	animeTVWithCount = "animeTVWithCount",
 	animeMovieWithCount = "animeMovieWithCount",
@@ -248,33 +242,6 @@ enum I18nKey {
 	animeTypeChinese = "animeTypeChinese",
 	animeTypeDrama = "animeTypeDrama",
 	animeTypeConcert = "animeTypeConcert",
-
-	// MyAnimeList
-	mal = "mal",
-	malSubtitle = "malSubtitle",
-	malCategoryAnime = "malCategoryAnime",
-	malCategoryManga = "malCategoryManga",
-	malFilterAll = "malFilterAll",
-	malStatusWatching = "malStatusWatching",
-	malStatusReading = "malStatusReading",
-	malStatusCompleted = "malStatusCompleted",
-	malStatusOnHold = "malStatusOnHold",
-	malStatusDropped = "malStatusDropped",
-	malStatusPlanToWatch = "malStatusPlanToWatch",
-	malStatusPlanToRead = "malStatusPlanToRead",
-	malNoData = "malNoData",
-	malNoDataDescription = "malNoDataDescription",
-	malEmpty = "malEmpty",
-	malEmptyReason = "malEmptyReason",
-	malFetchError = "malFetchError",
-	malFetchErrorDesc = "malFetchErrorDesc",
-	malNotConfigured = "malNotConfigured",
-	malNotConfiguredDesc = "malNotConfiguredDesc",
-	malLastUpdated = "malLastUpdated",
-	malSeasonWinter = "malSeasonWinter",
-	malSeasonSpring = "malSeasonSpring",
-	malSeasonSummer = "malSeasonSummer",
-	malSeasonFall = "malSeasonFall",
 
 	// 分页
 	paginationFirst = "paginationFirst",
@@ -337,13 +304,6 @@ enum I18nKey {
 	randomRecommend = "randomRecommend",
 	noRelatedPosts = "noRelatedPosts",
 	noRandomPosts = "noRandomPosts",
-
-	// 文章系列
-	series = "series",
-	seriesPartOf = "seriesPartOf",
-	seriesPart = "seriesPart",
-	seriesThisArticle = "seriesThisArticle",
-	noSeries = "noSeries",
 
 	// 加密
 	postEncrypted = "postEncrypted",
