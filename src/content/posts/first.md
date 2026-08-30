@@ -6,7 +6,7 @@ description: 我特選要沒救了。
 tags: [Markdown, "67"]
 category: 文章示例
 image: ./images/IMG_20260824_152756_921.jpg
-slug: first
+slug: "676767"
 ---
 
 

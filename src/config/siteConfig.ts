@@ -9,27 +9,16 @@ export const siteConfig: SiteConfig = {
   title: "LuYishan Blog",
 
   // 站点副标题
-  subtitle: "分享、实践、学习",
+  subtitle: "你是甲",
 
   // 站点 URL
   site_url: "https://2r.hk",
 
   // 站点描述
-  description:
-    "记录技术成长路上的思考与实践，分享编程开发、技术探索和问题解决的心得体会。在这里，你可以找到实用的技术教程、开发经验总结、以及各种有趣的技术发现。让我们一起在代码的世界里不断学习，持续进步。",
+  description: "67676。",
 
   // 站点关键词
-  keywords: [
-    "Firefly",
-    "Fuwari",
-    "Astro",
-    "ACGN",
-    "LuYishan",
-    "Blog",
-    "博客",
-    "技术博客",
-    "静态博客",
-  ],
+  keywords: ["LuYishan"],
 
   // 主题色
   themeColor: {
@@ -101,7 +90,7 @@ export const siteConfig: SiteConfig = {
   },
 
   // 站点开始日期，用于统计运行天数
-  siteStartDate: "2025-01-01",
+  siteStartDate: "2026-8-29",
 
   // 站点时区（IANA 时区字符串），用于格式化bangumi、rss里的构建日期时间等等..
   // 示例："Asia/Shanghai", "UTC", 如果为空，则按照构建服务器的时区进行时区转换
