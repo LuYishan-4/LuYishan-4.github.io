@@ -4,49 +4,57 @@ import type { FriendLink, FriendsPageConfig } from "../types/friendsConfig";
 
 // 友链页面配置
 export const friendsPageConfig: FriendsPageConfig = {
-	// 页面标题，如果留空则使用 i18n 中的翻译
-	title: "",
+  // 页面标题，如果留空则使用 i18n 中的翻译
+  title: "",
 
-	// 页面描述文本，如果留空则使用 i18n 中的翻译
-	description: "",
+  // 页面描述文本，如果留空则使用 i18n 中的翻译
+  description: "",
 
-	// 是否显示底部自定义内容（friends.mdx 中的内容）
-	showCustomContent: true,
+  // 是否显示底部自定义内容（friends.mdx 中的内容）
+  showCustomContent: true,
 
-	// 是否显示评论区，需要先在commentConfig.ts启用评论系统
-	showComment: true,
+  // 是否显示评论区，需要先在commentConfig.ts启用评论系统
+  showComment: true,
 
-	// 是否开启随机排序配置，如果开启，就会忽略权重，构建时进行一次随机排序
-	randomizeSort: true,
+  // 是否开启随机排序配置，如果开启，就会忽略权重，构建时进行一次随机排序
+  randomizeSort: true,
 };
 
 // 友链配置
 export const friendsConfig: FriendLink[] = [
-	{
-		title: "青呱GUA",
-		imgurl: "https://guatw.net/images/IMG_9209.png",
-		desc: "呱",
-		siteurl: "https://guatw.net/index.html",
-		weight: 5,
-		enabled: true,
-	},
-	{
-		title: "淳",
-		imgurl: "https://chuen666666.com/img/avatar.jpg",
-		desc: "電神",
-		siteurl: "https://chuen666666.com/",
-		weight: 5,
-		enabled: true,
-	},
+  {
+    title: "青呱GUA",
+    imgurl: "https://guatw.net/images/IMG_9209.png",
+    desc: "呱",
+    siteurl: "https://guatw.net/index.html",
+    weight: 5,
+    enabled: true,
+  },
+  {
+    title: "淳",
+    imgurl: "https://chuen666666.com/img/avatar.jpg",
+    desc: "電神",
+    siteurl: "https://chuen666666.com/",
+    weight: 5,
+    enabled: true,
+  },
+  {
+    title: "Vessel",
+    imgurl: "https://sleepomen.github.io/images/pochi.webp",
+    desc: "文組小廢物",
+    siteurl: "https://sleepomen.github.io",
+    weight: 5,
+    enabled: true,
+  },
 ];
 
 // 获取启用的友链并进行排序
 export const getEnabledFriends = (): FriendLink[] => {
-	const friends = friendsConfig.filter((friend) => friend.enabled);
+  const friends = friendsConfig.filter((friend) => friend.enabled);
 
-	if (friendsPageConfig.randomizeSort) {
-		return friends.sort(() => Math.random() - 0.5);
-	}
+  if (friendsPageConfig.randomizeSort) {
+    return friends.sort(() => Math.random() - 0.5);
+  }
 
-	return friends.sort((a, b) => b.weight - a.weight);
+  return friends.sort((a, b) => b.weight - a.weight);
 };
