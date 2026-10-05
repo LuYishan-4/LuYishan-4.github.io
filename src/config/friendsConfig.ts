@@ -46,6 +46,14 @@ export const friendsConfig: FriendLink[] = [
     weight: 5,
     enabled: true,
   },
+  {
+    title: "baihu",
+    imgurl: "https://baihu-tw.com/uploads/e485c11b3eaaf1b183f1c4f8c8c4f4ef",
+    desc: "鹹魚翻身了還是鹹魚",
+    siteurl: "https://baihu-tw.com/",
+    weight: 5,
+    enabled: true,
+  },
 ];
 
 // 获取启用的友链并进行排序
