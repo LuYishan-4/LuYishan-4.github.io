@@ -5,7 +5,7 @@ pinned: false
 description: kwin開發。
 tags: [Markdown, "Kwin"]
 category: 文章示例
-image: ./images/IMG_20260806_160843_128.jpg
+image: ./images/kwin.jpg
 slug: kpluginhow
 ---
 

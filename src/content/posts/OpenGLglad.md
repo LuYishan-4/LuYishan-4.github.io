@@ -5,7 +5,7 @@ pinned: false
 description: 包含常見安裝擴充。
 tags: [Markdown, "OpenGL"]
 category: 文章示例
-image: ./images/1787624700704.jpg
+image: ./images/opengl.jpg
 slug: OpenGLglad
 ---
 
