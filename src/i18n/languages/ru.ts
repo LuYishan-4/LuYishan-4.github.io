@@ -464,6 +464,7 @@ export const ru: Translation = {
 	// Фоновый видеоплеер
 	[Key.videoPlay]: "Воспроизвести фоновое видео",
 	[Key.videoPause]: "Пауза фонового видео",
+	[Key.retroMode]: "Режим хаоса",
 	[Key.videoPrev]: "Предыдущее видео",
 	[Key.videoNext]: "Следующее видео",
 	[Key.videoLoadError]: "Не удалось загрузить видео",

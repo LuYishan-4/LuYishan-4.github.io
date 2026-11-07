@@ -452,6 +452,7 @@ export const zh_TW: Translation = {
   // 背景影片播放器
   [Key.videoPlay]: "播放背景影片",
   [Key.videoPause]: "暫停背景影片",
+  [Key.retroMode]: "切換抽象模式",
   [Key.videoPrev]: "上一個影片",
   [Key.videoNext]: "下一個影片",
   [Key.videoLoadError]: "影片載入失敗",

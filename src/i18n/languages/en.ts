@@ -462,6 +462,7 @@ export const en: Translation = {
 	// Background video player
 	[Key.videoPlay]: "Play background video",
 	[Key.videoPause]: "Pause background video",
+	[Key.retroMode]: "Toggle chaos mode",
 	[Key.videoPrev]: "Previous video",
 	[Key.videoNext]: "Next video",
 	[Key.videoLoadError]: "Video failed to load",

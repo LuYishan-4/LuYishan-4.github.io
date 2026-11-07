@@ -8,6 +8,7 @@ import FancyboxManager from "@components/features/FancyboxManager.astro";
 import FontSetup from "@components/features/FontSetup.astro";
 import MusicManager from "@components/features/MusicManager.astro";
 import MusicPlayerView from "@components/features/MusicPlayerView.astro";
+import RetroMode from "@components/features/RetroMode.astro";
 import SakuraEffect from "@components/features/SakuraEffect.astro";
 import ConfigCarrier from "@components/layout/ConfigCarrier.astro";
 
@@ -35,6 +36,7 @@ import "@/styles/main.css";
 import "@/styles/variables.styl";
 import "@/styles/markdown-extend.styl";
 import "@/styles/mouse.css";
+import "@/styles/retro.css";
 import "@rehype-callouts-theme";
 
 interface Props {
@@ -611,6 +613,11 @@ const siteLang = lang.replace("_", "-");
         var follow = stored !== null ? stored === "true" : defaultFollowTheme;
         if (follow) document.body.classList.add("card-follow-theme-hue");
         else document.body.classList.remove("card-follow-theme-hue");
+
+        // 抽象模式：首屏前加上类名，避免先闪一下原样
+        try {
+          if (localStorage.getItem("retroMode") === "1") document.documentElement.classList.add("retro-mode");
+        } catch (e) {}
       })();
     </script>
 
@@ -629,6 +636,9 @@ const siteLang = lang.replace("_", "-");
 
     <!-- Sakura Effect -->
     <SakuraEffect />
+
+    <!-- 抽象模式 -->
+    <RetroMode />
 
     <!-- Fancybox Manager -->
     <FancyboxManager />

@@ -1,0 +1,895 @@
+/* 抽象模式（retro mode）：仿 LuYishan 小破站的复古皮肤，内容不变，只换外观。
+ * 所有规则都挂在 html.retro-mode 下，切换类名即可开关；动画相关见 RetroMode.astro。 */
+
+html.retro-mode {
+	--page-bg: #2b2b2b;
+	--card-bg: #3a3a3a;
+	--card-bg-transparent: #3a3a3a;
+	--float-panel-bg: #3a3a3a;
+	--primary: #00f6ff;
+	--line-divider: #8a8a8a;
+	--line-color: #8a8a8a;
+	--deep-text: #ffffff;
+	--title-active: #00f6ff;
+	--link-hover: #00f6ff;
+	--btn-content: #ffffff;
+	--btn-regular-bg: #4b4b4b;
+	--btn-regular-bg-hover: #5a5a5a;
+	--btn-regular-bg-active: #666666;
+	--btn-plain-bg-hover: #4b4b4b;
+	--btn-plain-bg-active: #5a5a5a;
+	--btn-card-bg-hover: #4b4b4b;
+	--btn-card-bg-active: #5a5a5a;
+	--inline-code-bg: #111111;
+	--inline-code-color: #00ff66;
+	--radius-large: 0;
+	--retro-font: "Comic Sans MS", "Chalkboard", "Comic Neue", cursive, sans-serif;
+	color-scheme: dark;
+}
+
+html.retro-mode body {
+	/* 黄→橙→大红渐变 + 一层花纹，越吵越好 */
+	background-color: #ff1200;
+	background-image:
+		radial-gradient(circle, rgba(255, 230, 0, 0.45) 0 14%, transparent 15%),
+		repeating-conic-gradient(
+			from 45deg,
+			rgba(255, 170, 0, 0.35) 0 25%,
+			transparent 0 50%
+		),
+		linear-gradient(180deg, #ffe08a 0, #ff8a00 22rem, #ff1200 40rem);
+	background-size:
+		44px 44px,
+		44px 44px,
+		100% 100%;
+	background-attachment: fixed;
+	color: #f5f5f5;
+	font-family: var(--retro-font);
+	padding-bottom: 3.2rem;
+}
+
+html.retro-mode body::before {
+	content: "";
+	position: fixed;
+	inset: 0;
+	background: url("/retro/bg.png") center / cover no-repeat;
+	opacity: 0.12;
+	mix-blend-mode: multiply;
+	z-index: 0;
+	pointer-events: none;
+}
+
+html.retro-mode body :where(h1, h2, h3, h4, h5, h6, p, a, span, li, div, button, input) {
+	font-family: var(--retro-font);
+}
+
+html.retro-mode :where(pre, code, kbd, samp, .expressive-code *) {
+	font-family: ui-monospace, "JetBrains Mono", monospace !important;
+}
+
+/* 樱花换成乱飞的 gif */
+html.retro-mode #canvas_sakura {
+	display: none;
+}
+
+/* ---------- 横幅：灰阶 + 扫描线 ---------- */
+html.retro-mode #banner-images-container {
+	filter: saturate(2.6) contrast(1.4) hue-rotate(-25deg) brightness(0.8);
+}
+
+html.retro-mode #wallpaper-wrapper::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: 15;
+	pointer-events: none;
+	background: repeating-linear-gradient(
+		0deg,
+		rgba(0, 0, 0, 0.35) 0 2px,
+		transparent 2px 4px
+	);
+}
+
+html.retro-mode .banner-home-text-overlay h1,
+html.retro-mode .banner-home-text-overlay .banner-title {
+	text-shadow:
+		3px 3px 0 rgb(10, 10, 16),
+		-3px -3px 0 green;
+	animation: retro-wobble 2.4s ease-in-out infinite;
+}
+
+html.retro-mode #header-waves,
+html.retro-mode #wallpaper-gradient {
+	display: none;
+}
+
+/* ---------- 导航栏 ---------- */
+/* 背景色由 RetroMode.astro 的 paintNavbar() 以 inline !important 写入 */
+html.retro-mode #navbar > div:not(.absolute) {
+	border: 4px ridge #8a8a8a !important;
+	border-radius: 0 !important;
+	box-shadow: -8px -8px 0 2px #1a1a1a !important;
+	backdrop-filter: none !important;
+}
+
+html.retro-mode #navbar a,
+html.retro-mode #navbar button {
+	border-radius: 0 !important;
+	color: #000 !important;
+}
+
+html.retro-mode #navbar a:hover {
+	color: #0000ee !important;
+	text-decoration: underline;
+}
+
+html.retro-mode #retro-mode-switch {
+	background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+	color: #000;
+	border: 3px ridge #fff;
+	animation: retro-hue 3s linear infinite;
+}
+
+/* ---------- 卡片 ---------- */
+html.retro-mode .card-base,
+html.retro-mode .card-base-transparent,
+html.retro-mode .float-panel {
+	background: #111 !important;
+	border: 4px solid #0000ff !important;
+	border-radius: 0 !important;
+	box-shadow: 8px 8px 0 #ffff00 !important;
+	color: #f5f5f5;
+}
+
+html.retro-mode #post-list-container > .card-base:nth-child(3n + 2),
+html.retro-mode #left-sidebar .card-base:nth-child(even),
+html.retro-mode #right-sidebar .card-base:nth-child(odd) {
+	border-color: #00ff00 !important;
+	box-shadow: 8px 8px 0 #ff00d4 !important;
+}
+
+html.retro-mode #post-list-container > .card-base:nth-child(3n) {
+	border-color: #ff00d4 !important;
+	box-shadow: 8px 8px 0 #00f6ff !important;
+}
+
+html.retro-mode .floating-btn.card-base {
+	border-width: 3px !important;
+	box-shadow: -4px -4px 0 2px #1a1a1a !important;
+}
+
+html.retro-mode #post-list-container > .card-base:nth-child(odd) {
+	transform: rotate(-1.2deg) translateX(4px);
+}
+
+html.retro-mode #post-list-container > .card-base:nth-child(even) {
+	transform: rotate(1deg) translateY(-2px);
+}
+
+html.retro-mode #left-sidebar .card-base:nth-child(odd),
+html.retro-mode #right-sidebar .card-base:nth-child(even) {
+	transform: rotate(-1.5deg);
+}
+
+html.retro-mode #left-sidebar .card-base:nth-child(even),
+html.retro-mode #right-sidebar .card-base:nth-child(odd) {
+	transform: rotate(1.2deg);
+}
+
+html.retro-mode .card-base img {
+	border-radius: 0 !important;
+	outline: 3px solid #0000ff;
+	outline-offset: -3px;
+}
+
+/* ---------- 按钮 / 标签 ---------- */
+html.retro-mode .btn-regular,
+html.retro-mode .btn-card,
+html.retro-mode a.btn,
+html.retro-mode .btn-regular-dark {
+	border: 3px ridge #8a8a8a !important;
+	border-radius: 0 !important;
+	background: #4b4b4b !important;
+	color: #fff !important;
+}
+
+/* ---------- 正文 ---------- */
+html.retro-mode .custom-md :where(h1, h2, h3) {
+	color: #fff;
+	text-shadow:
+		2px 2px 0 rgb(10, 10, 16),
+		-2px -2px 0 green;
+}
+
+html.retro-mode .custom-md a:not(.no-styling) {
+	color: #00f6ff;
+	background: none;
+	text-decoration: underline wavy #ff00ff;
+}
+
+html.retro-mode .custom-md img {
+	border: 4px solid #fff;
+	border-radius: 0 !important;
+}
+
+html.retro-mode .custom-md blockquote {
+	border-left: 6px dashed #00ff66;
+	background: #222;
+}
+
+html.retro-mode .post-card-title {
+	color: #ffff00 !important;
+}
+
+html.retro-mode .post-card-title:hover {
+	color: #00f6ff !important;
+	text-decoration: underline;
+}
+
+html.retro-mode ::selection {
+	background: #ff00ff;
+	color: #fff;
+}
+
+/* ---------- 每页顶部的抽象标题（RetroMode.astro 注入） ---------- */
+.retro-page-header {
+	display: none;
+}
+
+html.retro-mode .retro-page-header {
+	display: block;
+	margin-bottom: 1.5rem;
+	text-align: center;
+	overflow: hidden;
+	perspective: 600px;
+}
+
+.retro-err {
+	color: #fff;
+	background: #000;
+	padding: 0.5em;
+	font-family: monospace !important;
+	text-align: left;
+	font-size: 0.85rem;
+	word-break: break-all;
+}
+
+.retro-page-title {
+	display: inline-block;
+	margin: 0.6em 0 0.3em;
+	font-size: 2.2rem;
+	font-weight: bold;
+	color: #fff;
+	text-shadow:
+		3px 3px 0 rgb(10, 10, 16),
+		-3px -3px 0 green;
+	transform-style: preserve-3d;
+	animation: retro-title-spin 2.8s linear infinite;
+}
+
+.retro-header-row {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+.retro-rainbow {
+	background: linear-gradient(
+		90deg,
+		red,
+		orange,
+		yellow,
+		green,
+		blue,
+		indigo,
+		violet,
+		red
+	);
+	background-size: 200% 100%;
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	font-weight: bold;
+	font-size: 1.3rem;
+	animation: retro-rainbow-slide 3s linear infinite;
+}
+
+.retro-blink {
+	animation: retro-blinker 1s step-start infinite;
+}
+
+.retro-header-row img {
+	max-width: 80px;
+	border: 3px ridge #8a8a8a;
+}
+
+/* ---------- sojo 风：标题栏 / gif 条 / 关注我 / 假资源管理器 / 巨型彩字 ---------- */
+.retro-titlebar {
+	background: linear-gradient(180deg, #fff6b0, #ffb300);
+	color: #fff;
+	font-size: clamp(1.8rem, 5vw, 3rem);
+	font-weight: 900;
+	text-align: left;
+	padding: 0.1em 0.3em;
+	text-shadow:
+		2px 2px 0 #c45a00,
+		-1px -1px 0 #c45a00;
+	font-family: Arial, "Microsoft JhengHei", sans-serif !important;
+}
+
+.retro-gif-strip {
+	background: #000;
+	overflow: hidden;
+	padding: 6px 0;
+}
+
+.retro-gif-track {
+	display: flex;
+	align-items: flex-end;
+	gap: 6px;
+	width: max-content;
+	animation: retro-marquee 26s linear infinite;
+}
+
+.retro-gif-track img {
+	width: auto;
+	border: 3px solid #0000ff;
+	background: #fff;
+}
+
+.retro-header-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: flex-start;
+	justify-content: space-between;
+	margin-top: 0.8rem;
+	text-align: left;
+}
+
+.retro-follow {
+	color: #000;
+	font-size: 0.95rem;
+	transform: rotate(-2deg);
+}
+
+.retro-follow-links {
+	display: flex;
+	gap: 0.4rem;
+	margin: 0.3rem 0;
+}
+
+.retro-follow-links a {
+	background: #e6162d;
+	color: #fff !important;
+	padding: 0.1em 0.5em;
+	border: 2px outset #ff8080;
+	text-decoration: none;
+	font-size: 0.85rem;
+}
+
+.retro-follow-avatar {
+	width: 110px;
+	margin-top: 0.4rem;
+	border: 4px solid #c71585;
+	image-rendering: pixelated;
+}
+
+.retro-explorer {
+	flex: 1 1 340px;
+	max-width: 520px;
+	background: #fff;
+	color: #000;
+	border: 2px solid #7a7a7a;
+	box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5);
+	font-family: "Segoe UI", "Microsoft JhengHei", sans-serif !important;
+	font-size: 0.8rem;
+	transform: rotate(1.5deg);
+}
+
+.retro-explorer * {
+	font-family: inherit !important;
+}
+
+.retro-explorer-title {
+	display: flex;
+	justify-content: space-between;
+	background: linear-gradient(90deg, #000080, #1084d0);
+	color: #fff;
+	padding: 2px 6px;
+	font-weight: bold;
+}
+
+.retro-explorer table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.retro-explorer th {
+	text-align: left;
+	font-weight: normal;
+	color: #4c607a;
+	padding: 3px 6px;
+	border-bottom: 1px solid #e5e5e5;
+}
+
+.retro-explorer td {
+	padding: 3px 6px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 260px;
+	cursor: default;
+}
+
+.retro-explorer tr:hover td {
+	background: #e5f3ff;
+}
+
+.retro-explorer tr.is-selected td,
+.retro-explorer tr:focus td {
+	background: #cce8ff;
+	outline: none;
+}
+
+.retro-explorer-hint {
+	color: #888;
+	padding: 2px 6px 4px;
+}
+
+.retro-giant {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 0.05em;
+	margin: 0.4rem 0;
+	line-height: 1.1;
+	font-weight: 900;
+	font-family: "Microsoft JhengHei", "PingFang TC", sans-serif !important;
+}
+
+.retro-giant span {
+	font-family: inherit !important;
+}
+
+.retro-diamond {
+	display: inline-grid;
+	place-items: center;
+	width: 1.6em;
+	height: 1.6em;
+	margin: 0 0.25em;
+	background: #000;
+	color: #fff;
+	font-size: 1.5rem;
+	transform: rotate(45deg);
+}
+
+.retro-clock {
+	position: absolute;
+	top: 5rem;
+	right: 10px;
+	color: #0000ee;
+	background: rgba(255, 246, 176, 0.85);
+	padding: 0 0.4em;
+	font-family: "Times New Roman", serif !important;
+	font-size: 0.85rem;
+	pointer-events: none !important;
+}
+
+.retro-trail {
+	position: fixed;
+	pointer-events: none !important;
+	font-size: 1.1rem;
+	font-weight: bold;
+	text-shadow: 1px 1px 0 #000;
+	animation: retro-trail-fall 0.9s ease-in forwards;
+}
+
+@keyframes retro-trail-fall {
+	from {
+		transform: translate(-50%, -50%) scale(1);
+		opacity: 1;
+	}
+	to {
+		transform: translate(-50%, 40px) rotate(180deg) scale(0.4);
+		opacity: 0;
+	}
+}
+
+/* ---------- 底部状态条：运行时间 + 跑马灯 + 按钮 ---------- */
+#retro-root {
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	z-index: 90;
+}
+
+#retro-root > * {
+	pointer-events: auto;
+}
+
+.retro-bar {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+	align-items: stretch;
+	height: 2.6rem;
+	background: #000;
+	border-top: 4px dashed #c8c8c8;
+	font-family: var(--retro-font);
+	color: #f3f7f3;
+}
+
+.retro-runtime {
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	padding: 0 0.7em;
+	background: #111;
+	border-right: 3px solid #666;
+	font-family: monospace !important;
+	font-size: 0.8rem;
+	white-space: nowrap;
+}
+
+.retro-marquee {
+	flex: 1;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	font-size: 1.05rem;
+	white-space: nowrap;
+}
+
+.retro-marquee span {
+	display: inline-block;
+	padding-left: 100%;
+	animation: retro-marquee var(--retro-marquee-duration, 90s) linear infinite;
+}
+
+.retro-bar-btn {
+	flex-shrink: 0;
+	border: 3px ridge #8a8a8a;
+	background: #4b4b4b;
+	color: #fff;
+	cursor: pointer;
+	padding: 0 0.6em;
+	font-size: 0.9rem;
+	font-family: var(--retro-font);
+}
+
+.retro-bar-btn:hover {
+	color: #00f6ff;
+}
+
+/* ---------- 钢琴 ---------- */
+.retro-piano {
+	position: absolute;
+	left: 50%;
+	bottom: calc(2.6rem + 10px);
+	transform: translateX(-50%);
+	max-width: 96vw;
+	overflow-x: auto;
+	background: rgba(10, 10, 10, 0.6);
+	padding: 6px 10px;
+	border-radius: 8px;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+
+.retro-piano[hidden] {
+	display: none;
+}
+
+.retro-piano-keys {
+	display: inline-flex;
+	position: relative;
+	height: 130px;
+	user-select: none;
+}
+
+.retro-piano-key {
+	width: 44px;
+	height: 130px;
+	border: 1px solid #222;
+	background: #fff;
+	color: #000;
+	margin-right: -1px;
+	box-shadow:
+		inset 0 -8px 0 #ccc,
+		0 6px 0 #222;
+	cursor: pointer;
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	padding-bottom: 10px;
+	font-size: 0.75rem;
+	transition:
+		transform 0.1s ease,
+		background 0.1s ease;
+}
+
+.retro-piano-key.black {
+	position: absolute;
+	top: 0;
+	width: 30px;
+	height: 82px;
+	background: #111;
+	color: #fff;
+	z-index: 2;
+	box-shadow:
+		inset 0 -6px 0 #000,
+		0 6px 0 #111;
+}
+
+.retro-piano-key.active {
+	transform: translateY(4px);
+	background: #ffeb8f;
+}
+
+.retro-piano-key.black.active {
+	background: #ffd54f;
+}
+
+/* ---------- 乱飞的 gif ---------- */
+.retro-float-gif {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: auto;
+	pointer-events: none !important;
+	filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.5));
+	will-change: transform;
+}
+
+/* ---------- 切换动画 ---------- */
+#retro-transition {
+	position: fixed;
+	inset: 0;
+	z-index: 10000;
+	pointer-events: all;
+	overflow: hidden;
+	font-family: monospace;
+}
+
+#retro-transition .rt-scan {
+	position: absolute;
+	inset: 0;
+	background: repeating-linear-gradient(
+		0deg,
+		rgba(0, 0, 0, 0.45) 0 2px,
+		transparent 2px 4px
+	);
+	animation: retro-scan-roll 0.25s linear infinite;
+}
+
+#retro-transition .rt-noise {
+	position: absolute;
+	inset: -50%;
+	opacity: 0;
+	background-image: radial-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px);
+	background-size: 3px 3px;
+	animation: retro-noise 0.12s steps(2) infinite;
+}
+
+#retro-transition .rt-screen {
+	position: absolute;
+	inset: 0;
+	background: #000;
+	color: #00ff66;
+	padding: 8vh 8vw;
+	font-size: clamp(0.85rem, 1.6vw, 1.15rem);
+	line-height: 1.7;
+	opacity: 0;
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+#retro-transition .rt-screen .rt-err {
+	color: #fff;
+}
+
+#retro-transition .rt-screen .rt-ok {
+	color: #ff00ff;
+}
+
+#retro-transition .rt-cursor {
+	display: inline-block;
+	width: 0.6em;
+	height: 1.1em;
+	vertical-align: text-bottom;
+	background: #00ff66;
+	animation: retro-blinker 0.6s step-start infinite;
+}
+
+#retro-transition .rt-slice {
+	position: absolute;
+	left: 0;
+	right: 0;
+	background: #000;
+}
+
+#retro-transition .rt-line {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 50%;
+	height: 100vh;
+	margin-top: -50vh;
+	background: #fff;
+	transform-origin: center;
+	opacity: 0;
+}
+
+/* 切换中整页抖动 + RGB 分离 */
+html.retro-glitching body > :not(#retro-transition) {
+	animation: retro-glitch 0.18s steps(2) infinite;
+}
+
+html.retro-dropping #main-grid,
+html.retro-dropping #top-row {
+	animation: retro-drop-in 0.7s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+html.retro-leaving #retro-root .retro-float-gif {
+	transition:
+		transform 0.6s ease-in,
+		opacity 0.6s ease-in;
+	opacity: 0;
+}
+
+html.retro-leaving #retro-root > :not(.retro-float-gif) {
+	transition: transform 0.5s ease-in;
+	transform: translateY(120%);
+}
+
+html.retro-restoring #main-grid,
+html.retro-restoring #top-row {
+	animation: retro-restore-in 0.6s ease-out both;
+}
+
+/* ---------- keyframes ---------- */
+@keyframes retro-title-spin {
+	0% {
+		transform: rotateY(0deg) rotateZ(0deg) scale(1);
+		filter: drop-shadow(0 0 2px #ff00ff) drop-shadow(0 0 4px #00f6ff);
+	}
+	25% {
+		transform: rotateY(90deg) rotateZ(90deg) scale(1.08);
+		filter: drop-shadow(0 0 2px #ff4d4d) drop-shadow(0 0 4px #00f6ff);
+	}
+	50% {
+		transform: rotateY(180deg) rotateZ(180deg) scale(1.15);
+		filter: drop-shadow(0 0 2px #00ff66) drop-shadow(0 0 4px #ff00ff);
+	}
+	75% {
+		transform: rotateY(270deg) rotateZ(270deg) scale(1.08);
+		filter: drop-shadow(0 0 2px #00f6ff) drop-shadow(0 0 4px #ff4d4d);
+	}
+	100% {
+		transform: rotateY(360deg) rotateZ(360deg) scale(1);
+		filter: drop-shadow(0 0 2px #ff00ff) drop-shadow(0 0 4px #00f6ff);
+	}
+}
+
+@keyframes retro-wobble {
+	0%,
+	100% {
+		transform: rotate(-2deg) scale(1);
+	}
+	50% {
+		transform: rotate(2deg) scale(1.04);
+	}
+}
+
+@keyframes retro-hue {
+	to {
+		filter: hue-rotate(360deg);
+	}
+}
+
+@keyframes retro-rainbow-slide {
+	to {
+		background-position: 200% 0;
+	}
+}
+
+@keyframes retro-blinker {
+	50% {
+		opacity: 0;
+	}
+}
+
+@keyframes retro-marquee {
+	to {
+		transform: translateX(-100%);
+	}
+}
+
+@keyframes retro-scan-roll {
+	to {
+		background-position: 0 4px;
+	}
+}
+
+@keyframes retro-noise {
+	0% {
+		transform: translate(0, 0);
+	}
+	100% {
+		transform: translate(-3px, 2px);
+	}
+}
+
+@keyframes retro-glitch {
+	0% {
+		transform: translate(0, 0) skewX(0deg);
+		filter: drop-shadow(-4px 0 0 rgba(255, 0, 0, 0.7))
+			drop-shadow(4px 0 0 rgba(0, 255, 255, 0.7)) hue-rotate(0deg);
+	}
+	50% {
+		transform: translate(-6px, 3px) skewX(-4deg);
+		filter: drop-shadow(6px 0 0 rgba(255, 0, 255, 0.7))
+			drop-shadow(-6px 0 0 rgba(0, 255, 0, 0.7)) hue-rotate(90deg);
+	}
+	100% {
+		transform: translate(5px, -2px) skewX(3deg);
+		filter: drop-shadow(-3px 0 0 rgba(255, 0, 0, 0.7))
+			drop-shadow(3px 0 0 rgba(0, 255, 255, 0.7)) hue-rotate(200deg);
+	}
+}
+
+@keyframes retro-drop-in {
+	0% {
+		transform: translateY(-40px) rotate(-4deg) scale(1.08);
+		opacity: 0;
+	}
+	100% {
+		transform: none;
+		opacity: 1;
+	}
+}
+
+@keyframes retro-restore-in {
+	0% {
+		filter: blur(12px) saturate(0);
+		opacity: 0;
+		transform: scale(0.97);
+	}
+	100% {
+		filter: none;
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@media (max-width: 768px) {
+	.retro-page-title {
+		font-size: 1.5rem;
+	}
+	.retro-runtime {
+		display: none;
+	}
+	.retro-clock {
+		display: none;
+	}
+	.retro-explorer {
+		transform: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.retro-page-title,
+	.retro-marquee span,
+	.retro-rainbow,
+	.retro-blink,
+	.retro-gif-track,
+	html.retro-mode .banner-home-text-overlay h1,
+	html.retro-mode #retro-mode-switch {
+		animation: none !important;
+	}
+}

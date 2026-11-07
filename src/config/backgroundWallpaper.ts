@@ -44,7 +44,6 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 			"assets/images/DesktopWallpaper/d2.avif",
 			"assets/images/DesktopWallpaper/d3.avif",
 			"assets/images/DesktopWallpaper/d4.avif",
-			"assets/images/DesktopWallpaper/d5.avif",
 			"assets/images/DesktopWallpaper/d6.avif",
 		],
 		// 移动背景图片（支持单张或多张随机）
@@ -81,6 +80,10 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 			// 主页横幅副标题
 			subtitle: [
 				"鬼門開會不會有傲嬌酪梨雌小鬼半夜跑來吸我的陽氣啊o(////▽////)q欸嘿嘿...想想就開心",
+				"嗨,歡迎來到我的小破站",
+				"Ciallo～(∠・ω< )⌒☆",
+				"為什麼要演奏春日影",
+				"點右上角的 ✦ 會發生很抽象的事",
 			],
 			// 主页横幅副标题字体大小
 			subtitleSize: "1.5rem",

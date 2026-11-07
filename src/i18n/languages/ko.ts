@@ -459,6 +459,7 @@ export const ko: Translation = {
 	// Background video player
 	[Key.videoPlay]: "배경 영상 재생",
 	[Key.videoPause]: "배경 영상 일시정지",
+	[Key.retroMode]: "카오스 모드 전환",
 	[Key.videoPrev]: "이전 영상",
 	[Key.videoNext]: "다음 영상",
 	[Key.videoLoadError]: "영상을 불러오지 못했습니다",

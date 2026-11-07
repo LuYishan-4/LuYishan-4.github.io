@@ -27,5 +27,11 @@ export const profileConfig: ProfileConfig = {
 			url: "https://github.com/LuYishan-4",
 			showName: false,
 		},
+		{
+			name: "Discord",
+			icon: "fa7-brands:discord",
+			url: "https://discord.com/users/874997511398510602",
+			showName: false,
+		},
 	],
 };

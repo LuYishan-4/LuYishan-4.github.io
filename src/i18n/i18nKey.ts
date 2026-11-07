@@ -447,6 +447,7 @@ enum I18nKey {
 	// 背景视频播放器
 	videoPlay = "videoPlay",
 	videoPause = "videoPause",
+	retroMode = "retroMode",
 	videoPrev = "videoPrev",
 	videoNext = "videoNext",
 	videoLoadError = "videoLoadError",

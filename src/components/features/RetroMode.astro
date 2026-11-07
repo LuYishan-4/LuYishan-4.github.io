@@ -1,0 +1,734 @@
+---
+// 抽象模式：导航栏右上角 #retro-mode-switch 触发，一段故障/CRT 动画后整站换成
+// LuYishan 小破站的复古皮肤（内容不变）。皮肤样式在 src/styles/retro.css，
+// 状态存 localStorage("retroMode")，Layout.astro 在首屏前就把 html.retro-mode 加上。
+import { getSortedPosts } from "@utils/content-utils";
+import { getPostUrlBySlug, url } from "@utils/url-utils";
+
+const posts = (await getSortedPosts()).map((post) => ({
+	title: post.data.title,
+	url: getPostUrlBySlug(post.id),
+	published: post.data.published.toISOString(),
+}));
+---
+
+<div
+	id="retro-mode-data"
+	hidden
+	data-posts={JSON.stringify(posts)}
+	data-asset-base={url("/retro/")}
+>
+</div>
+
+<script>
+	import { siteConfig } from "@/config";
+
+	const STORAGE_KEY = "retroMode";
+	const root = document.documentElement;
+	const dataEl = document.getElementById("retro-mode-data") as HTMLElement;
+	const assetBase = dataEl.dataset.assetBase || "/retro/";
+	const posts: { title: string; url: string; published: string }[] = JSON.parse(
+		dataEl.dataset.posts || "[]",
+	);
+	const asset = (name: string) => assetBase + name;
+	const reducedMotion = window.matchMedia(
+		"(prefers-reduced-motion: reduce)",
+	).matches;
+
+	const FLY_GIFS = [
+		"taffy",
+		"arisu",
+		"phoebe",
+		"sherii",
+		"dance",
+		"kkkk",
+		"mortis",
+		"sakuya",
+		"mutsumi",
+	].map((name) => asset(`fly/${name}.gif`));
+
+	const MARQUEE_LINES = [
+		"关注塔菲喵关注塔菲谢谢喵🤩",
+		"塔不灭塔不灭雏草姬不灭😜",
+		"敲响古老塔钟未来信号连通[微笑]",
+		"我跟着流星雨穿越遥远時候車[惊喜]",
+		"意料外的旅程前方困難重重[打call]",
+		"但我也不放棄尋找屬於我的夢[喜歡]",
+		"警告!警告!有黑草姫正在駛來[驚訝]",
+		"雛草姬需要保護![口罩]",
+		"準備加速! taffy要衝出來了!🤪",
+		"看我打喵拳!😣",
+		"王牌級Gamer! (oh!)😛",
+		"王牌級偶像!(wow!)🤠",
+		"世紀末王牌級發·明・家😝",
+	];
+
+	const TITLE_FRAMES = [
+		"▁▂▃▄▅▆▇",
+		"▂▁▂▃▄▅▆",
+		"▃▂▁▂▃▄▅",
+		"▄▃▂▁▂▃▄",
+		"▅▄▃▂▁▂▃",
+	];
+
+	// 随机换成乱码的文字：标题类的静态文本，正文不动
+	const MOJIBAKE_TARGETS = [
+		".post-card-title",
+		".widget-name",
+		"#swup-container h1:not(.sr-only)",
+		".banner-title",
+	].join(",");
+
+	const GIANT_COLORS = [
+		"#ff6a00",
+		"#ffd400",
+		"#00e436",
+		"#00f6ff",
+		"#2b5cff",
+		"#ff00d4",
+		"#ffffff",
+	];
+
+	const TRAIL_CHARS = ["�", "喵", "★", "♥", "☆", "�", "草"];
+
+	const PIANO_KEYS: [string, number, number?][] = [
+		["C", 261.63],
+		["C#", 277.18, 29],
+		["D", 293.66],
+		["D#", 311.13, 72],
+		["E", 329.63],
+		["F", 349.23],
+		["F#", 369.99, 158],
+		["G", 392.0],
+		["G#", 415.3, 201],
+		["A", 440.0],
+		["A#", 466.16, 244],
+		["B", 493.88],
+	];
+
+	// ------------------------------------------------------------------ utils
+	function el<K extends keyof HTMLElementTagNameMap>(
+		tag: K,
+		props: Partial<HTMLElementTagNameMap[K]> & { className?: string } = {},
+		children: (Node | string)[] = [],
+	): HTMLElementTagNameMap[K] {
+		const node = Object.assign(document.createElement(tag), props);
+		for (const child of children) node.append(child);
+		return node;
+	}
+
+	const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+	function navigate(target: string) {
+		if (window.swup) window.swup.navigate(target);
+		else location.href = target;
+	}
+
+	function mojibake(text: string, rate = 0.12): string {
+		return Array.from(text, (ch) =>
+			ch.trim() && Math.random() < rate ? "�" : ch,
+		).join("");
+	}
+
+	function formatDate(iso: string): string {
+		const d = new Date(iso);
+		const pad = (n: number) => String(n).padStart(2, "0");
+		return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+	}
+
+	function readStored(): boolean {
+		try {
+			return localStorage.getItem(STORAGE_KEY) === "1";
+		} catch {
+			return false;
+		}
+	}
+
+	function writeStored(on: boolean) {
+		try {
+			if (on) localStorage.setItem(STORAGE_KEY, "1");
+			else localStorage.removeItem(STORAGE_KEY);
+		} catch {
+			/* 隐私模式等情况下写不进去也无所谓 */
+		}
+	}
+
+	function pageTitle(): string {
+		return baseTitle.split(" - ")[0] || baseTitle;
+	}
+
+	// ------------------------------------------------------------------ audio
+	let audioCtx: AudioContext | null = null;
+	let bgm: HTMLAudioElement | null = null;
+	let haruAudio: HTMLAudioElement | null = null;
+	let pianoPressCount = 0;
+
+	function playTone(freq: number, duration = 0.3) {
+		audioCtx ??= new AudioContext();
+		const ctx = audioCtx;
+		const when = ctx.currentTime + 0.01;
+		const env = ctx.createGain();
+		env.gain.setValueAtTime(0.0001, when);
+		env.gain.linearRampToValueAtTime(0.4, when + 0.01);
+		env.gain.exponentialRampToValueAtTime(0.0005, when + duration + 0.08);
+		const filter = ctx.createBiquadFilter();
+		filter.type = "lowpass";
+		filter.frequency.setValueAtTime(9000, when);
+		filter.frequency.exponentialRampToValueAtTime(3200, when + duration * 0.4);
+		env.connect(filter);
+		filter.connect(ctx.destination);
+		for (const [type, mult, gain] of [
+			["triangle", 1, 0.7],
+			["sine", 2, 0.22],
+			["sine", 1.5, 0.08],
+		] as const) {
+			const osc = ctx.createOscillator();
+			osc.type = type;
+			osc.frequency.value = freq * mult;
+			const g = ctx.createGain();
+			g.gain.value = gain;
+			osc.connect(g);
+			g.connect(env);
+			osc.start(when);
+			osc.stop(when + duration + 0.12);
+		}
+	}
+
+	// ------------------------------------------------------------- retro chrome
+	let chrome: HTMLElement | null = null;
+	let rafId = 0;
+	let titleTimer = 0;
+	let runtimeTimer = 0;
+	let baseTitle = document.title;
+	const originalIcons = new Map<HTMLLinkElement, string>();
+
+	function buildRuntime(): HTMLElement {
+		const node = el("div", { className: "retro-runtime" });
+		const start = new Date(siteConfig.siteStartDate || Date.now()).getTime();
+		const tick = () => {
+			const elapsed = Math.max(0, Math.floor((Date.now() - start) / 1000));
+			const d = Math.floor(elapsed / 86400);
+			const pad = (n: number) => String(n).padStart(2, "0");
+			const h = pad(Math.floor((elapsed % 86400) / 3600));
+			const m = pad(Math.floor((elapsed % 3600) / 60));
+			const s = pad(elapsed % 60);
+			node.textContent = `運行時間: ${d}d ${h}:${m}:${s} | 總文章數: ${posts.length}`;
+		};
+		tick();
+		runtimeTimer = window.setInterval(tick, 1000);
+		return node;
+	}
+
+	function buildBar(): HTMLElement {
+		const text = MARQUEE_LINES.join("　　");
+		const marquee = el("div", { className: "retro-marquee" }, [
+			el("span", { textContent: text }),
+		]);
+		marquee.style.setProperty(
+			"--retro-marquee-duration",
+			`${Math.max(30, text.length / 6)}s`,
+		);
+
+		const musicBtn = el("button", {
+			className: "retro-bar-btn",
+			type: "button",
+			textContent: "來聽Mortis唱歌",
+		});
+		musicBtn.addEventListener("click", () => {
+			bgm ??= Object.assign(new Audio(asset("sad.mp3")), { loop: true });
+			if (bgm.paused) {
+				bgm
+					.play()
+					.then(() => {
+						musicBtn.textContent = "Mortis唱太難聽";
+					})
+					.catch(() => {});
+			} else {
+				bgm.pause();
+				musicBtn.textContent = "來聽Mortis唱歌";
+			}
+		});
+
+		const pianoBtn = el("button", {
+			className: "retro-bar-btn",
+			type: "button",
+			textContent: "🎹",
+			title: "鋼琴（連按三下有驚喜）",
+		});
+		pianoBtn.addEventListener("click", () => {
+			const piano = chrome?.querySelector<HTMLElement>(".retro-piano");
+			if (piano) piano.hidden = !piano.hidden;
+		});
+
+		return el("div", { className: "retro-bar" }, [
+			buildRuntime(),
+			marquee,
+			pianoBtn,
+			musicBtn,
+		]);
+	}
+
+	function buildPiano(): HTMLElement {
+		const keys = el("div", { className: "retro-piano-keys" });
+		for (const [note, freq, left] of PIANO_KEYS) {
+			const key = el("button", {
+				type: "button",
+				className: `retro-piano-key${left === undefined ? "" : " black"}`,
+				textContent: note,
+			});
+			if (left !== undefined) key.style.left = `${left}px`;
+			key.addEventListener("click", () => {
+				playTone(freq);
+				key.classList.add("active");
+				setTimeout(() => key.classList.remove("active"), 120);
+				pianoPressCount += 1;
+				if (pianoPressCount === 3) {
+					pianoPressCount = 0;
+					haruAudio ??= Object.assign(new Audio(asset("haruhikage.m4a")), {
+						volume: 0.5,
+					});
+					haruAudio.currentTime = 0;
+					haruAudio.play().catch(() => {});
+				}
+			});
+			keys.append(key);
+		}
+		return el("div", { className: "retro-piano", hidden: true }, [keys]);
+	}
+
+	function startFloatingGifs(container: HTMLElement) {
+		if (reducedMotion) return;
+		const count = window.innerWidth < 768 ? 3 : 5;
+		const sprites = Array.from({ length: count }, () => {
+			const size = 45 + Math.random() * 35;
+			const img = el("img", {
+				className: "retro-float-gif",
+				src: FLY_GIFS[Math.floor(Math.random() * FLY_GIFS.length)],
+				alt: "",
+				decoding: "async",
+			});
+			img.style.width = `${size}px`;
+			container.append(img);
+			return {
+				img,
+				x: Math.random() * 90,
+				y: Math.random() * 80,
+				dx: (Math.random() - 0.5) * 0.25,
+				dy: (Math.random() - 0.5) * 0.25,
+			};
+		});
+		let last = performance.now();
+		const step = (now: number) => {
+			const dt = Math.min(64, now - last) / 16;
+			last = now;
+			for (const s of sprites) {
+				s.x += s.dx * dt;
+				s.y += s.dy * dt;
+				if (s.x < 0 || s.x > 95) s.dx = -s.dx;
+				if (s.y < 0 || s.y > 88) s.dy = -s.dy;
+				s.img.style.transform = `translate(${s.x}vw, ${s.y}vh)`;
+			}
+			rafId = requestAnimationFrame(step);
+		};
+		rafId = requestAnimationFrame(step);
+	}
+
+	function buildGifStrip(): HTMLElement {
+		const strip = el("div", { className: "retro-gif-strip" });
+		const track = el("div", { className: "retro-gif-track" });
+		// 两份一样的内容接起来，滚到一半时无缝回到开头
+		for (let copy = 0; copy < 2; copy++) {
+			FLY_GIFS.forEach((src, i) => {
+				const img = el("img", { src, alt: "", loading: "lazy" });
+				img.style.height = i % 2 ? "56px" : "36px";
+				track.append(img);
+			});
+		}
+		strip.append(track);
+		return strip;
+	}
+
+	function buildFollow(): HTMLElement {
+		const link = (text: string, href: string) =>
+			el("a", { href, textContent: text, target: "_blank", rel: "noopener noreferrer" });
+		return el("div", { className: "retro-follow" }, [
+			el("div", { textContent: "快來關注我！！-----v" }),
+			el("div", { className: "retro-follow-links" }, [
+				link("GitHub", "https://github.com/LuYishan-4"),
+				link("Discord", "https://discord.com/users/874997511398510602"),
+			]),
+			el("div", { textContent: "^----快來關注我！！！" }),
+			el("img", { src: asset("avatar.jpg"), alt: "", className: "retro-follow-avatar" }),
+		]);
+	}
+
+	function buildExplorer(): HTMLElement {
+		const rows = el("tbody");
+		for (const post of posts) {
+			const row = el("tr", { tabIndex: 0 }, [
+				el("td", { textContent: `📄 ${post.title}.exe` }),
+				el("td", { textContent: formatDate(post.published) }),
+				el("td", { textContent: "應用程式" }),
+			]);
+			row.addEventListener("dblclick", () => navigate(post.url));
+			row.addEventListener("click", () => {
+				rows.querySelector(".is-selected")?.classList.remove("is-selected");
+				row.classList.add("is-selected");
+			});
+			row.addEventListener("keydown", (e) => {
+				if (e.key === "Enter") navigate(post.url);
+			});
+			rows.append(row);
+		}
+		return el("div", { className: "retro-explorer" }, [
+			el("div", { className: "retro-explorer-title" }, [
+				el("span", { textContent: "📁 C:\\LuYishan\\posts" }),
+				el("span", { className: "retro-explorer-btns", textContent: "_ □ ×" }),
+			]),
+			el("table", {}, [
+				el("thead", {}, [
+					el("tr", {}, ["名稱", "修改日期", "類型"].map((t) => el("th", { textContent: t }))),
+				]),
+				rows,
+			]),
+			el("div", { className: "retro-explorer-hint", textContent: "（雙擊開啟）" }),
+		]);
+	}
+
+	function buildGiantTitle(text: string): HTMLElement {
+		const giant = el("div", { className: "retro-giant" });
+		for (const ch of Array.from(text)) {
+			if (ch.trim() && Math.random() < 0.15) {
+				giant.append(el("span", { className: "retro-diamond", textContent: "?" }));
+				continue;
+			}
+			const span = el("span", { textContent: ch });
+			span.style.color = GIANT_COLORS[Math.floor(Math.random() * GIANT_COLORS.length)];
+			span.style.fontSize = `${2 + Math.random() * 2.2}rem`;
+			giant.append(span);
+		}
+		return giant;
+	}
+
+	function injectPageHeader() {
+		document.querySelector(".retro-page-header")?.remove();
+		const container = document.getElementById("swup-container");
+		if (!container) return;
+		const header = el("div", { className: "retro-page-header" }, [
+			el("div", {
+				className: "retro-err",
+				innerHTML: `${mojibake("Parse error")}: syntax error, ${mojibake("unexpected")} T_STRING in <b>${mojibake("C:\\NMserv\\www114514\\index.php")}</b> on line <b>87</b>`,
+			}),
+			el("div", { className: "retro-titlebar", textContent: mojibake("LuYishan的小破個網 by RR", 0.2) }),
+			buildGifStrip(),
+			el("div", { className: "retro-header-grid" }, [buildFollow(), buildExplorer()]),
+			el("h2", {
+				className: "retro-page-title",
+				textContent: `▓▒░ ${pageTitle()} ░▒▓`,
+			}),
+			buildGiantTitle(`${pageTitle()}，你好世界`),
+			el("div", { className: "retro-header-row" }, [
+				el("img", { src: asset("deco.gif"), alt: "" }),
+				el("p", {
+					className: "retro-rainbow",
+					textContent: "hallo wold · 嗨,歡迎來到我的小破站 · Ciallo～(∠・ω< )⌒☆",
+				}),
+				el("img", { src: asset("blink.jpg"), alt: "", className: "retro-blink" }),
+			]),
+		]);
+		container.prepend(header);
+	}
+
+	// 记下被改成乱码的文字节点，退出时还原
+	const garbled: [Text, string][] = [];
+
+	function garbleTitles() {
+		for (const target of document.querySelectorAll(MOJIBAKE_TARGETS)) {
+			const walker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT);
+			for (let node = walker.nextNode() as Text | null; node; node = walker.nextNode() as Text | null) {
+				if (!node.data.trim() || garbled.some(([n]) => n === node)) continue;
+				garbled.push([node, node.data]);
+				node.data = mojibake(node.data);
+			}
+		}
+	}
+
+	function restoreTitles() {
+		for (const [node, text] of garbled) node.data = text;
+		garbled.length = 0;
+	}
+
+	let trailCleanup: (() => void) | null = null;
+
+	function startCursorTrail(container: HTMLElement) {
+		if (reducedMotion || !window.matchMedia("(pointer: fine)").matches) return;
+		let lastSpawn = 0;
+		const onMove = (e: PointerEvent) => {
+			const now = performance.now();
+			if (now - lastSpawn < 45 || container.childElementCount > 80) return;
+			lastSpawn = now;
+			const dot = el("span", {
+				className: "retro-trail",
+				textContent: TRAIL_CHARS[Math.floor(Math.random() * TRAIL_CHARS.length)],
+			});
+			dot.style.left = `${e.clientX}px`;
+			dot.style.top = `${e.clientY}px`;
+			dot.style.color = GIANT_COLORS[Math.floor(Math.random() * GIANT_COLORS.length)];
+			container.append(dot);
+			dot.addEventListener("animationend", () => dot.remove());
+		};
+		window.addEventListener("pointermove", onMove, { passive: true });
+		trailCleanup = () => window.removeEventListener("pointermove", onMove);
+	}
+
+	let clockTimer = 0;
+
+	// 主题在 CSS layer 里用 !important 设了导航栏背景，样式表盖不过，只能写 inline
+	function paintNavbar(on: boolean) {
+		const bar = document.querySelector<HTMLElement>("#navbar > div:not(.absolute)");
+		if (!bar) return;
+		if (on) bar.style.setProperty("background", "linear-gradient(180deg, #fff6b0, #ffb300)", "important");
+		else bar.style.removeProperty("background");
+	}
+
+	function buildClock(): HTMLElement {
+		const clock = el("div", { className: "retro-clock" });
+		const tick = () => {
+			clock.textContent = new Date().toString();
+		};
+		tick();
+		clockTimer = window.setInterval(tick, 1000);
+		return clock;
+	}
+
+	function swapFavicons(on: boolean) {
+		const links = document.querySelectorAll<HTMLLinkElement>('link[rel~="icon"]');
+		for (const link of links) {
+			if (on) {
+				if (!originalIcons.has(link)) originalIcons.set(link, link.href);
+				link.href = asset("favicon.gif");
+			} else if (originalIcons.has(link)) {
+				link.href = originalIcons.get(link) as string;
+			}
+		}
+		if (!on) originalIcons.clear();
+	}
+
+	function mountChrome() {
+		if (chrome) return;
+		chrome = el("div", { id: "retro-root" });
+		chrome.append(buildBar(), buildPiano(), buildClock());
+		document.body.append(chrome);
+		startFloatingGifs(chrome);
+		startCursorTrail(chrome);
+		paintNavbar(true);
+		injectPageHeader();
+		garbleTitles();
+		swapFavicons(true);
+		baseTitle = document.title;
+		let frame = 0;
+		titleTimer = window.setInterval(() => {
+			frame = (frame + 1) % TITLE_FRAMES.length;
+			document.title = `${TITLE_FRAMES[frame]} ui▀┳╲ ${baseTitle} ▓`;
+		}, 250);
+	}
+
+	function unmountChrome() {
+		cancelAnimationFrame(rafId);
+		clearInterval(titleTimer);
+		clearInterval(runtimeTimer);
+		clearInterval(clockTimer);
+		trailCleanup?.();
+		trailCleanup = null;
+		restoreTitles();
+		paintNavbar(false);
+		bgm?.pause();
+		haruAudio?.pause();
+		chrome?.remove();
+		chrome = null;
+		document.querySelector(".retro-page-header")?.remove();
+		swapFavicons(false);
+		document.title = baseTitle;
+	}
+
+	// ------------------------------------------------------------- transitions
+	function typeLines(screen: HTMLElement, lines: [string, string?][], speed: number) {
+		const cursor = el("span", { className: "rt-cursor" });
+		screen.append(cursor);
+		return lines.reduce(
+			(chain, [text, cls]) =>
+				chain.then(async () => {
+					const line = el("div", { className: cls || "" });
+					screen.insertBefore(line, cursor);
+					for (let i = 0; i < text.length; i += 3) {
+						line.textContent = text.slice(0, i + 3);
+						await sleep(speed);
+					}
+				}),
+			Promise.resolve(),
+		);
+	}
+
+	async function playEnter() {
+		const overlay = el("div", { id: "retro-transition" });
+		const noise = el("div", { className: "rt-noise" });
+		const screen = el("div", { className: "rt-screen" });
+		overlay.append(screen, noise, el("div", { className: "rt-scan" }));
+		document.body.append(overlay);
+
+		// 1. 整页抖动 + RGB 分离 + 雪花
+		root.classList.add("retro-glitching");
+		noise.animate([{ opacity: 0 }, { opacity: 0.9 }], {
+			duration: 600,
+			fill: "forwards",
+		});
+		await sleep(650);
+
+		// 2. 黑屏终端打字
+		root.classList.remove("retro-glitching");
+		screen.style.opacity = "1";
+		noise.style.opacity = "0.25";
+		await typeLines(
+			screen,
+			[
+				["Parse err0r: unexpected T_STRING in C:\\NMserv\\www114514\\index.php on line 87", "rt-err"],
+				["> 正在載入 抽象.exe ..."],
+				["[██████████████████████] 114%"],
+				["> 關注塔菲喵關注塔菲謝謝喵 ✓", "rt-ok"],
+				["> 為什麼要演奏春日影 ✓", "rt-ok"],
+			],
+			12,
+		);
+		await sleep(250);
+
+		// 3. 背后换皮
+		root.classList.add("retro-mode");
+		mountChrome();
+
+		// 4. 屏幕切成横条向两边甩开，内容掉下来
+		screen.remove();
+		noise.remove();
+		const slices = 8;
+		const pieces = Array.from({ length: slices }, (_, i) => {
+			const piece = el("div", { className: "rt-slice" });
+			piece.style.top = `${(i * 100) / slices}%`;
+			piece.style.height = `${100 / slices + 0.5}%`;
+			overlay.append(piece);
+			return piece.animate(
+				[
+					{ transform: "translateX(0)" },
+					{ transform: `translateX(${i % 2 ? 110 : -110}%) skewX(${i % 2 ? 20 : -20}deg)` },
+				],
+				{
+					duration: 520,
+					delay: i * 35,
+					easing: "cubic-bezier(.6,0,.9,.5)",
+					fill: "forwards",
+				},
+			).finished;
+		});
+		root.classList.add("retro-dropping");
+		await Promise.all(pieces);
+		overlay.remove();
+		await sleep(250);
+		root.classList.remove("retro-dropping");
+	}
+
+	async function playLeave() {
+		const overlay = el("div", { id: "retro-transition" });
+		overlay.style.background = "transparent";
+		const line = el("div", { className: "rt-line" });
+		overlay.append(line, el("div", { className: "rt-scan" }));
+		document.body.append(overlay);
+
+		// 1. 小东西们掉出屏幕
+		root.classList.add("retro-leaving");
+		for (const gif of document.querySelectorAll<HTMLElement>(".retro-float-gif")) {
+			gif.style.transform += ` translateY(120vh) rotate(${Math.random() > 0.5 ? "" : "-"}540deg)`;
+		}
+		await sleep(450);
+
+		// 2. CRT 关机：白光压成一条线再收成一个点
+		overlay.style.background = "#000";
+		await line.animate(
+			[
+				{ opacity: 1, transform: "scale(1, 1)" },
+				{ opacity: 1, transform: "scale(1, 0.004)", offset: 0.55 },
+				{ opacity: 1, transform: "scale(0.001, 0.004)" },
+			],
+			{ duration: 520, easing: "ease-in", fill: "forwards" },
+		).finished;
+
+		// 3. 背后换回原样，再从模糊中淡入
+		root.classList.remove("retro-leaving", "retro-mode");
+		unmountChrome();
+		root.classList.add("retro-restoring");
+		await overlay.animate([{ opacity: 1 }, { opacity: 0 }], {
+			duration: 380,
+			fill: "forwards",
+		}).finished;
+		overlay.remove();
+		await sleep(300);
+		root.classList.remove("retro-restoring");
+	}
+
+	let busy = false;
+
+	async function toggleRetro(on = !root.classList.contains("retro-mode")) {
+		if (busy || on === root.classList.contains("retro-mode")) return;
+		busy = true;
+		writeStored(on);
+		syncButton(on);
+		try {
+			if (reducedMotion) {
+				root.classList.toggle("retro-mode", on);
+				if (on) mountChrome();
+				else unmountChrome();
+			} else if (on) {
+				await playEnter();
+			} else {
+				await playLeave();
+			}
+		} finally {
+			busy = false;
+		}
+	}
+
+	function syncButton(on: boolean) {
+		document
+			.getElementById("retro-mode-switch")
+			?.setAttribute("aria-pressed", String(on));
+	}
+
+	// ------------------------------------------------------------------- init
+	document.getElementById("retro-mode-switch")?.addEventListener("click", () => {
+		void toggleRetro();
+	});
+
+	if (readStored()) {
+		root.classList.add("retro-mode");
+		mountChrome();
+		syncButton(true);
+	}
+
+	function onPageView() {
+		if (!chrome) return;
+		// 内容替换后标题已经是新页面的；favicon 可能被 updateHead 换回去
+		baseTitle = document.title.replace(/^[▁▂▃▄▅▆▇]+ ui▀┳╲ | ▓$/g, "");
+		// 旧页面的文字节点已被换掉，丢掉它们的记录
+		for (let i = garbled.length - 1; i >= 0; i--) {
+			if (!garbled[i][0].isConnected) garbled.splice(i, 1);
+		}
+		injectPageHeader();
+		garbleTitles();
+		swapFavicons(true);
+	}
+
+	if (window.swup?.hooks) {
+		window.swup.hooks.on("content:replace", onPageView);
+	} else {
+		document.addEventListener("swup:enable", () => {
+			window.swup.hooks.on("content:replace", onPageView);
+		});
+	}
+</script>

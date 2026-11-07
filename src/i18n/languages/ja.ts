@@ -460,6 +460,7 @@ export const ja: Translation = {
 	// 背景動画プレイヤー
 	[Key.videoPlay]: "背景動画を再生",
 	[Key.videoPause]: "背景動画を一時停止",
+	[Key.retroMode]: "カオスモード切替",
 	[Key.videoPrev]: "前の動画",
 	[Key.videoNext]: "次の動画",
 	[Key.videoLoadError]: "動画の読み込みに失敗しました",

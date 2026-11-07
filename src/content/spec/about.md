@@ -24,7 +24,9 @@
 
 ## About Me
 
-hight school student like linux 
+嗨,我是 LuYishan,116 特選生,一個來自新北的學生。過去玩過 FRC 和其他大大小小的機器人競賽,近期打算多打磨自己在**資安**和**演算法**方面的認識。這裡是我的個人小破站,歡迎隨便逛逛。
+
+High school student who likes Linux.
 
 Right now, I'm especially interested in:
 
@@ -63,7 +65,16 @@ The previous UltralightWeb_Cursor project has been integrated into this project,
 
 ### Tools / Infrastructure
 
-![Tools and Infrastructure](https://skillicons.dev/icons?i=linux,arch,kali,ubuntu,docker,nginx,pnpm,git,github,cmake,raspberrypi,arch)
+![Tools and Infrastructure](https://skillicons.dev/icons?i=linux,arch,kali,ubuntu,docker,nginx,pnpm,git,github,cmake,raspberrypi)
+
+### Hardware / Security
+
+![Arduino](https://img.shields.io/badge/Arduino-00979D?style=for-the-badge&logo=arduino&logoColor=white)
+![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-A22846?style=for-the-badge&logo=raspberrypi&logoColor=white)
+![Jetson Nano](https://img.shields.io/badge/Jetson%20Nano-76B900?style=for-the-badge&logo=nvidia&logoColor=white)
+![YOLO](https://img.shields.io/badge/YOLO-Visual%20Model-FF6B6B?style=for-the-badge)
+![gRPC](https://img.shields.io/badge/gRPC-244c5a?style=for-the-badge&logo=grpc&logoColor=white)
+![GDB / Pwntools](https://img.shields.io/badge/GDB%20%2F%20Pwntools-000000?style=for-the-badge)
 
 ---
 
