@@ -12,7 +12,7 @@ export const siteConfig: SiteConfig = {
   subtitle: "你是甲",
 
   // 站点 URL
-  site_url: "https://luyishan-4.com",
+  site_url: "https://luyishan-4.github.io",
 
   // 站点描述
   description: "67676。",
