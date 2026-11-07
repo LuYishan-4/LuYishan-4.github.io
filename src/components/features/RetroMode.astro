@@ -552,123 +552,110 @@ const posts = (await getSortedPosts()).map((post) => ({
 	}
 
 	// ------------------------------------------------------------- transitions
-	function typeLines(screen: HTMLElement, lines: [string, string?][], speed: number) {
-		const cursor = el("span", { className: "rt-cursor" });
-		screen.append(cursor);
-		return lines.reduce(
-			(chain, [text, cls]) =>
-				chain.then(async () => {
-					const line = el("div", { className: cls || "" });
-					screen.insertBefore(line, cursor);
-					for (let i = 0; i < text.length; i += 3) {
-						line.textContent = text.slice(0, i + 3);
-						await sleep(speed);
-					}
-				}),
-			Promise.resolve(),
+	// 切换动画：去背的琪露诺 fumo 边转边从右滑到左 → 「把你變成baka」从中间
+	// 突然放大到全屏（jump scare）并播放 baka 音效 → 趁全屏遮挡时在背后换皮
+	const SPIN_URL = asset("fumo-spin.webp");
+	const SCARE_URL = asset("baka.webp");
+	let bakaAudio: HTMLAudioElement | null = null;
+
+	function preloadTransition() {
+		for (const src of [SPIN_URL, SCARE_URL]) {
+			const img = new Image();
+			img.src = src;
+		}
+		bakaAudio ??= Object.assign(new Audio(asset("baka.mp3")), { preload: "auto" });
+	}
+
+	async function loadImage(src: string): Promise<HTMLImageElement> {
+		const img = el("img", { src, alt: "", decoding: "async" });
+		// 网络慢也别卡住：最多等 2 秒
+		await Promise.race([img.decode().catch(() => {}), sleep(2000)]);
+		return img;
+	}
+
+	async function playTransition(switchMode: () => void) {
+		preloadTransition();
+		const overlay = el("div", { id: "retro-transition" });
+		document.body.append(overlay);
+		const [spin, scare] = await Promise.all([loadImage(SPIN_URL), loadImage(SCARE_URL)]);
+
+		// 1. fumo 从右边滑到左边，背后整页文字抽搐
+		root.classList.add("retro-glitching");
+		spin.className = "rt-fumo";
+		overlay.append(spin);
+		const dim = overlay.animate([{ backgroundColor: "rgba(0,0,0,0)" }, { backgroundColor: "rgba(0,0,0,0.55)" }], {
+			duration: 300,
+			fill: "forwards",
+		});
+		await spin.animate(
+			[
+				{ transform: "translate(100vw, -50%)" },
+				{ transform: "translate(calc(-100% - 2vw), -50%)" },
+			],
+			{ duration: 2800, easing: "linear", fill: "forwards" },
+		).finished;
+		spin.remove();
+		root.classList.remove("retro-glitching");
+
+		// 2. jump scare：0.2 秒内从中间由小到大扑满全屏，到全屏那一刻「baka」
+		scare.className = "rt-scare";
+		overlay.append(scare);
+		dim.cancel();
+		overlay.style.backgroundColor = "#000";
+		overlay.animate([{ backgroundColor: "rgba(0,0,0,0.55)" }, { backgroundColor: "#000" }], {
+			duration: 200,
+		});
+		await scare.animate(
+			[
+				{ transform: "translate(-50%, -50%) scale(0.01)" },
+				{ transform: "translate(-50%, -50%) scale(1.08)" },
+			],
+			{ duration: 200, easing: "cubic-bezier(.3,0,.7,1)", fill: "forwards" },
+		).finished;
+		if (bakaAudio) {
+			bakaAudio.currentTime = 0;
+			bakaAudio.play().catch(() => {});
+		}
+		// 抖动用独立的 translate 属性，不跟上面的 transform 动画打架；放大到 1.08 抖起来不露边
+		scare.animate(
+			[
+				{ translate: "0 0" },
+				{ translate: "-14px 9px" },
+				{ translate: "12px -8px" },
+				{ translate: "-8px -10px" },
+				{ translate: "0 0" },
+			],
+			{ duration: 220, iterations: 3 },
 		);
+
+		// 3. 全屏挡住时在背后换皮
+		switchMode();
+		await sleep(650);
+
+		// 4. 收掉遮罩
+		await overlay.animate([{ opacity: 1 }, { opacity: 0 }], {
+			duration: 300,
+			fill: "forwards",
+		}).finished;
+		overlay.remove();
 	}
 
 	async function playEnter() {
-		const overlay = el("div", { id: "retro-transition" });
-		const noise = el("div", { className: "rt-noise" });
-		const screen = el("div", { className: "rt-screen" });
-		overlay.append(screen, noise, el("div", { className: "rt-scan" }));
-		document.body.append(overlay);
-
-		// 1. 整页抖动 + RGB 分离 + 雪花
-		root.classList.add("retro-glitching");
-		noise.animate([{ opacity: 0 }, { opacity: 0.9 }], {
-			duration: 600,
-			fill: "forwards",
+		await playTransition(() => {
+			root.classList.add("retro-mode", "retro-dropping");
+			mountChrome();
 		});
-		await sleep(650);
-
-		// 2. 黑屏终端打字
-		root.classList.remove("retro-glitching");
-		screen.style.opacity = "1";
-		noise.style.opacity = "0.25";
-		await typeLines(
-			screen,
-			[
-				["Parse err0r: unexpected T_STRING in C:\\NMserv\\www114514\\index.php on line 87", "rt-err"],
-				["> 正在載入 抽象.exe ..."],
-				["[██████████████████████] 114%"],
-				["> 關注塔菲喵關注塔菲謝謝喵 ✓", "rt-ok"],
-				["> 為什麼要演奏春日影 ✓", "rt-ok"],
-			],
-			12,
-		);
-		await sleep(250);
-
-		// 3. 背后换皮
-		root.classList.add("retro-mode");
-		mountChrome();
-
-		// 4. 屏幕切成横条向两边甩开，内容掉下来
-		screen.remove();
-		noise.remove();
-		const slices = 8;
-		const pieces = Array.from({ length: slices }, (_, i) => {
-			const piece = el("div", { className: "rt-slice" });
-			piece.style.top = `${(i * 100) / slices}%`;
-			piece.style.height = `${100 / slices + 0.5}%`;
-			overlay.append(piece);
-			return piece.animate(
-				[
-					{ transform: "translateX(0)" },
-					{ transform: `translateX(${i % 2 ? 110 : -110}%) skewX(${i % 2 ? 20 : -20}deg)` },
-				],
-				{
-					duration: 520,
-					delay: i * 35,
-					easing: "cubic-bezier(.6,0,.9,.5)",
-					fill: "forwards",
-				},
-			).finished;
-		});
-		root.classList.add("retro-dropping");
-		await Promise.all(pieces);
-		overlay.remove();
-		await sleep(250);
+		await sleep(700);
 		root.classList.remove("retro-dropping");
 	}
 
 	async function playLeave() {
-		const overlay = el("div", { id: "retro-transition" });
-		overlay.style.background = "transparent";
-		const line = el("div", { className: "rt-line" });
-		overlay.append(line, el("div", { className: "rt-scan" }));
-		document.body.append(overlay);
-
-		// 1. 小东西们掉出屏幕
-		root.classList.add("retro-leaving");
-		for (const gif of document.querySelectorAll<HTMLElement>(".retro-float-gif")) {
-			gif.style.transform += ` translateY(120vh) rotate(${Math.random() > 0.5 ? "" : "-"}540deg)`;
-		}
-		await sleep(450);
-
-		// 2. CRT 关机：白光压成一条线再收成一个点
-		overlay.style.background = "#000";
-		await line.animate(
-			[
-				{ opacity: 1, transform: "scale(1, 1)" },
-				{ opacity: 1, transform: "scale(1, 0.004)", offset: 0.55 },
-				{ opacity: 1, transform: "scale(0.001, 0.004)" },
-			],
-			{ duration: 520, easing: "ease-in", fill: "forwards" },
-		).finished;
-
-		// 3. 背后换回原样，再从模糊中淡入
-		root.classList.remove("retro-leaving", "retro-mode");
-		unmountChrome();
-		root.classList.add("retro-restoring");
-		await overlay.animate([{ opacity: 1 }, { opacity: 0 }], {
-			duration: 380,
-			fill: "forwards",
-		}).finished;
-		overlay.remove();
-		await sleep(300);
+		await playTransition(() => {
+			root.classList.remove("retro-mode");
+			unmountChrome();
+			root.classList.add("retro-restoring");
+		});
+		await sleep(600);
 		root.classList.remove("retro-restoring");
 	}
 
@@ -701,9 +688,13 @@ const posts = (await getSortedPosts()).map((post) => ({
 	}
 
 	// ------------------------------------------------------------------- init
-	document.getElementById("retro-mode-switch")?.addEventListener("click", () => {
+	const switchBtn = document.getElementById("retro-mode-switch");
+	switchBtn?.addEventListener("click", () => {
 		void toggleRetro();
 	});
+	// 鼠标移上去就先把动画素材拉下来，点下去时尽量不用等
+	switchBtn?.addEventListener("pointerenter", preloadTransition, { once: true });
+	switchBtn?.addEventListener("focus", preloadTransition, { once: true });
 
 	if (readStored()) {
 		root.classList.add("retro-mode");

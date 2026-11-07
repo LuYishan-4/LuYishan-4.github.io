@@ -646,86 +646,35 @@ html.retro-mode .retro-page-header {
 	will-change: transform;
 }
 
-/* ---------- 切换动画 ---------- */
+/* ---------- 切换动画（RetroMode.astro 的 playTransition） ---------- */
 #retro-transition {
 	position: fixed;
 	inset: 0;
 	z-index: 10000;
 	pointer-events: all;
 	overflow: hidden;
-	font-family: monospace;
 }
 
-#retro-transition .rt-scan {
+#retro-transition .rt-fumo {
 	position: absolute;
-	inset: 0;
-	background: repeating-linear-gradient(
-		0deg,
-		rgba(0, 0, 0, 0.45) 0 2px,
-		transparent 2px 4px
-	);
-	animation: retro-scan-roll 0.25s linear infinite;
-}
-
-#retro-transition .rt-noise {
-	position: absolute;
-	inset: -50%;
-	opacity: 0;
-	background-image: radial-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px);
-	background-size: 3px 3px;
-	animation: retro-noise 0.12s steps(2) infinite;
-}
-
-#retro-transition .rt-screen {
-	position: absolute;
-	inset: 0;
-	background: #000;
-	color: #00ff66;
-	padding: 8vh 8vw;
-	font-size: clamp(0.85rem, 1.6vw, 1.15rem);
-	line-height: 1.7;
-	opacity: 0;
-	white-space: pre-wrap;
-	word-break: break-all;
-}
-
-#retro-transition .rt-screen .rt-err {
-	color: #fff;
-}
-
-#retro-transition .rt-screen .rt-ok {
-	color: #ff00ff;
-}
-
-#retro-transition .rt-cursor {
-	display: inline-block;
-	width: 0.6em;
-	height: 1.1em;
-	vertical-align: text-bottom;
-	background: #00ff66;
-	animation: retro-blinker 0.6s step-start infinite;
-}
-
-#retro-transition .rt-slice {
-	position: absolute;
-	left: 0;
-	right: 0;
-	background: #000;
-}
-
-#retro-transition .rt-line {
-	position: absolute;
-	left: 0;
-	right: 0;
 	top: 50%;
-	height: 100vh;
-	margin-top: -50vh;
-	background: #fff;
-	transform-origin: center;
-	opacity: 0;
+	left: 0;
+	width: min(42vw, 360px);
+	height: auto;
+	filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.5));
 }
 
-/* 切换中整页抖动 + RGB 分离 */
+/* 脸怼满整个屏幕 */
+#retro-transition .rt-scare {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 100vw;
+	height: 100vh;
+	object-fit: cover;
+}
+
+/* 切换中整页文字抽搐 + RGB 分离 */
 html.retro-glitching body > :not(#retro-transition) {
 	animation: retro-glitch 0.18s steps(2) infinite;
 }
@@ -733,18 +682,6 @@ html.retro-glitching body > :not(#retro-transition) {
 html.retro-dropping #main-grid,
 html.retro-dropping #top-row {
 	animation: retro-drop-in 0.7s cubic-bezier(0.2, 1.4, 0.4, 1) both;
-}
-
-html.retro-leaving #retro-root .retro-float-gif {
-	transition:
-		transform 0.6s ease-in,
-		opacity 0.6s ease-in;
-	opacity: 0;
-}
-
-html.retro-leaving #retro-root > :not(.retro-float-gif) {
-	transition: transform 0.5s ease-in;
-	transform: translateY(120%);
 }
 
 html.retro-restoring #main-grid,
@@ -807,21 +744,6 @@ html.retro-restoring #top-row {
 @keyframes retro-marquee {
 	to {
 		transform: translateX(-100%);
-	}
-}
-
-@keyframes retro-scan-roll {
-	to {
-		background-position: 0 4px;
-	}
-}
-
-@keyframes retro-noise {
-	0% {
-		transform: translate(0, 0);
-	}
-	100% {
-		transform: translate(-3px, 2px);
 	}
 }
 
