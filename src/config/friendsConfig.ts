@@ -62,6 +62,14 @@ export const friendsConfig: FriendLink[] = [
     weight: 5,
     enabled: true,
   },
+  {
+    title: "Steven",
+    imgurl: "https://steventeng.uk/steven-drawing.png",
+    desc: "好玩:)",
+    siteurl: "https://steventeng.uk/",
+    weight: 5,
+    enabled: true,
+  },
 ];
 
 // 获取启用的友链并进行排序
