@@ -54,6 +54,14 @@ export const friendsConfig: FriendLink[] = [
     weight: 5,
     enabled: true,
   },
+  {
+    title: "柏T",
+    imgurl: "https://me.potinglin.org/favicon.svg",
+    desc: "因為嘴秋瞌藥被關小黑屋的傻B （他自己說的我可沒亂打🥵)",
+    siteurl: "https://me.potinglin.org/",
+    weight: 5,
+    enabled: true,
+  },
 ];
 
 // 获取启用的友链并进行排序
