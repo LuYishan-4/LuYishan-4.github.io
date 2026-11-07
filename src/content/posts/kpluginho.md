@@ -3,7 +3,7 @@ title: KDE-Wayland插件開發
 published: 2026-08-30
 pinned: false
 description: kwin開發。
-tags: [Markdown, "Kwin"]
+tags: [Markdown]
 category: 文章示例
 image: ./images/kwin.jpg
 slug: kpluginhow
