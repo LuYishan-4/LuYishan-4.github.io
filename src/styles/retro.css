@@ -123,11 +123,22 @@ html.retro-mode #navbar a:hover {
 	text-decoration: underline;
 }
 
-html.retro-mode #retro-mode-switch {
-	background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
-	color: #000;
-	border: 3px ridge #fff;
-	animation: retro-hue 3s linear infinite;
+/* 切换按钮：去背的琪露诺 fumo（两种模式都显示） */
+#retro-mode-switch .retro-switch-img {
+	height: 85%;
+	width: auto;
+	pointer-events: none;
+	user-select: none;
+	filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+	transition: transform 0.2s ease;
+}
+
+#retro-mode-switch:hover .retro-switch-img {
+	transform: rotate(-12deg) scale(1.1);
+}
+
+html.retro-mode #retro-mode-switch .retro-switch-img {
+	animation: retro-wobble 1.2s ease-in-out infinite;
 }
 
 /* ---------- 卡片 ---------- */
@@ -723,12 +734,6 @@ html.retro-restoring #top-row {
 	}
 }
 
-@keyframes retro-hue {
-	to {
-		filter: hue-rotate(360deg);
-	}
-}
-
 @keyframes retro-rainbow-slide {
 	to {
 		background-position: 200% 0;
@@ -811,7 +816,7 @@ html.retro-restoring #top-row {
 	.retro-blink,
 	.retro-gif-track,
 	html.retro-mode .banner-home-text-overlay h1,
-	html.retro-mode #retro-mode-switch {
+	html.retro-mode #retro-mode-switch .retro-switch-img {
 		animation: none !important;
 	}
 }

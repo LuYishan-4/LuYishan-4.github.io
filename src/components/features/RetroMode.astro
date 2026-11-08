@@ -466,6 +466,8 @@ const posts = (await getSortedPosts()).map((post) => ({
 		const onMove = (e: PointerEvent) => {
 			const now = performance.now();
 			if (now - lastSpawn < 45 || container.childElementCount > 80) return;
+			// 靠近导航栏（切换按钮）时不冒字
+			if ((e.target as Element | null)?.closest?.("#navbar")) return;
 			lastSpawn = now;
 			const dot = el("span", {
 				className: "retro-trail",
