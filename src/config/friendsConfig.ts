@@ -57,7 +57,7 @@ export const friendsConfig: FriendLink[] = [
   {
     title: "柏T",
     imgurl: "https://me.potinglin.org/favicon.svg",
-    desc: "因為嘴秋瞌藥被關小黑屋的傻B （他自己說的我可沒亂打🥵)",
+    desc: "因為開玩笑被DC封號的傻B",
     siteurl: "https://me.potinglin.org/",
     weight: 5,
     enabled: true,
